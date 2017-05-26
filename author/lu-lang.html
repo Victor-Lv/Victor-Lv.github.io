@@ -1,60 +1,42 @@
 <!DOCTYPE html>
 <html lang="chinese (simplified)">
 <head>
-    <meta charset="utf-8" />
-    <title>Victor Lv's Blog | Articles by 吕浪</title>
-    <link rel="shortcut icon" type="image/png" href="langlv.me/favicon.png">
-    <link rel="shortcut icon" type="image/x-icon" href="langlv.me/favicon.ico">
-    <link rel="stylesheet" href="langlv.me/theme/css/screen.css" type="text/css" />
-    <link rel="stylesheet" href="langlv.me/theme/css/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="langlv.me/theme/css/print.css" type="text/css" media="print" />
-    <meta name="generator" content="Pelican" />
+        <title>Victor Lv's Blog - Articles by 吕浪</title>
+        <meta charset="utf-8" />
 </head>
-<body>
-    <header>
-        <nav>
-            <ul>
 
-                <li class="ephemeral selected"><a href="langlv.me/author/lu-lang.html">吕浪</a></li>
-                <li><a href="langlv.me">Home</a></li>
-                <li><a href="https://github.com/">GitHub</a></li>
-                <li><a href="https://www.kernel.org/">Linux Kernel</a></li>
-                <li><a href="langlv.me/tags">Tags</a></li>
-                <li><a href="langlv.me/authors">Authors</a></li>
-                <li><a href="langlv.me/categories">Categories</a></li>
-                <li><a href="langlv.me/archives">Archives</a></li>
-            </ul>
-        </nav>
-        <div class="header_box">
-            <h1><a href="langlv.me">Victor Lv's Blog</a></h1>
-        </div>
-    </header>
-    <div id="wrapper">
-        <div id="content">            <h4 class="date">五月 26, 2017</h4>
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Victor Lv's Blog <strong></strong></a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+        </ul></nav><!-- /#menu -->
+<section id="content">
+<h2>Articles by 吕浪</h2>
 
-            <article class="post">
-                <h2 class="title">
-                    <a href="langlv.me/geng-gai-pelicanzhu-ti.html" rel="bookmark" title="Permanent Link to &quot;更改pelican主题&quot;">更改pelican主题</a>
-                </h2>
-
-                <p><toc></p>
+<ol id="post-list">
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/geng-gai-pelicanzhu-ti.html" rel="bookmark" title="Permalink to 更改pelican主题">更改pelican主题</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2017-05-26T22:30:00+02:00"> 周五 26 五月 2017 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/lu-lang.html">吕浪</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p><toc></p>
 <h2>更改pelican主题</h2>
 <p><strong> 特别注意: </strong>
-更改主题并把静态文件上传到github之后有时刷新网页看不到更改后的效果，可能是浏览器缓存作祟，应该从新标签页重新加载网站。</p>
-                <div class="clear"></div>
-
-                <div class="info">
-                    <a href="langlv.me/geng-gai-pelicanzhu-ti.html">posted at 22:30</a>
-                    &nbsp;&middot;&nbsp;<a href="langlv.me/category/pelican.html" rel="tag">Pelican</a>
-                </div>
-            </article>            <h4 class="date">五月 26, 2017</h4>
-
-            <article class="post">
-                <h2 class="title">
-                    <a href="langlv.me/yong-pelicangithubda-jian-ge-ren-bo-ke-wang-zhan.html" rel="bookmark" title="Permanent Link to &quot;用Pelican+Github搭建个人博客网站&quot;">用Pelican+Github搭建个人博客网站</a>
-                </h2>
-
-                <p><toc></p>
+更改主题并把静态文件上传到github之后有时刷新网页看不到更改后的效果，可能是浏览器缓存作祟，应该从新标签页重新加载网站。</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/yong-pelicangithubda-jian-ge-ren-bo-ke-wang-zhan.html" rel="bookmark" title="Permalink to 用Pelican+Github搭建个人博客网站">用Pelican+Github搭建个人博客网站</a></h2> </header>
+                <footer class="post-info">
+                    <time class="published" datetime="2017-05-26T22:20:00+02:00"> 周五 26 五月 2017 </time>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/lu-lang.html">吕浪</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p><toc></p>
 <h3>用Pelican+Github搭建个人博客网站</h3>
 <h4>1. 创建仓库</h4>
 <p>在github上创建一个username.github.io的仓库（username是你的github用户名）    </p>
@@ -70,49 +52,15 @@
    <a href="http://docs.getpelican.com/en/stable/quickstart.html">Pelican QuickStart</a>
    <a href="http://www.jianshu.com/p/d80a5cefc128">Pelican搭建静态博客</a></p>
 <h4>5. 使用Pelican发布文章</h4>
-<p>安装完Pelican之后，创建一个Project：</p>
-<div class="highlight"><pre><span></span>mkdir -p ~/projects/yoursite
-cd ~/projects/yoursite
-pelican-quickstart
-</pre></div>
-
-
-<p>执行完<code>pelican-quickstart</code>之后会看到在yoursite文件夹自动生成了一堆东西，cd到content目录，创建一个叫index.md的markdown文件，写入内容如下：</p>
-<div class="highlight"><pre><span></span><span class="n">Title</span><span class="o">:</span> <span class="n">My</span> <span class="n">First</span> <span class="n">Review</span>
-<span class="n">Date</span><span class="o">:</span> <span class="mi">2010</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">03</span> <span class="mi">10</span><span class="o">:</span><span class="mi">20</span>
-<span class="n">Category</span><span class="o">:</span> <span class="n">Review</span>
-
-<span class="n">Following</span> <span class="k">is</span> <span class="n">a</span> <span class="n">review</span> <span class="n">of</span> <span class="n">my</span> <span class="n">favorite</span> <span class="n">mechanical</span> <span class="n">keyboard</span><span class="o">.</span>
-</pre></div>
-
-
-<p>cd回退一级，执行<code>pelican content</code>,会看到output文件夹里面有一堆html和css的文件（夹），这就是根据你刚才的index.md生成的静态文件。<code>pelican content</code>命令是把content目录下面所有文件都转成静态文件。当更改了文件需要重新生成静态文件时，可以执行<code>make html</code>命令（在yousite目录（含Makefile文件）下），这之前需要安装make，Windows下安装教程参考：<a href="http://blog.csdn.net/pdcxs007/article/details/8582559/">Windows安装GNU编译器使用makefile</a></p>
-<h4>6. 使用git上传静态文件</h4>
-<p>把刚才生成的output文件夹里面的所有内容通过git上传到你刚才的仓库里去，注意执行git push之前应确保你已经git pull把云端的仓库同步到本地（因为刚才创建了CNAME文件更新了云端仓库）。上传完成之后，访问下你的域名吧！大功告成。</p>
-<p>另外，推荐个很棒的工具，继承了dos和linux shell命令行命令的命令行软件<a href="https://github.com/cmderdev/cmder">Cmder</a> 以后麻麻再也不用担心我在dos和linux命令行记忆中切换啦，直接一步到位，都用linux shell。</p>
-<p>参考文章：</p>
-<p><a href="http://www.wengweitao.com/shi-yong-pelican-github-pagesda-jian-ge-ren-bo-ke.html">使用Pelican + Github Pages搭建个人博客</a></p>
-<p><a href="http://blog.csdn.net/u012422829/article/details/46285577">利用Github建立你的个人网站</a></p>
-<p><a href="http://docs.getpelican.com/en/stable/quickstart.html">Pelican docs</a></p>
-<p><a href="http://www.tuicool.com/articles/6ZfEBrQ">用pelican在github上创建自己的博客!</a></p>
-<p>**本文作者为吕浪，原出处为：<a href="http://langlv.me">Victor Lv's blog</a>，转载请注明出处。</p>
-                <div class="clear"></div>
-
-                <div class="info">
-                    <a href="langlv.me/yong-pelicangithubda-jian-ge-ren-bo-ke-wang-zhan.html">posted at 22:20</a>
-                    &nbsp;&middot;&nbsp;<a href="langlv.me/category/pelican.html" rel="tag">Pelican</a>
-                </div>
-            </article>
-
-            <div class="clear"></div>
-            <footer>
-                <p>
-                <a href="https://github.com/jody-frankowski/blue-penguin">Blue Penguin</a> Theme
-                &middot;
-                Powered by <a href="http://getpelican.com">Pelican</a>
-            </footer>
-        </div>
-        <div class="clear"></div>
-    </div>
+<p>安装完Pelican之后 …</p> </div><!-- /.entry-content -->
+        </article></li>
+</ol><!-- /#posts-list -->
+</section><!-- /#content -->
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
 </body>
 </html>
