@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Victor Lv's Blog - Review</title><link href="http://langlv.me/" rel="alternate"></link><link href="http://langlv.me/feeds/review.atom.xml" rel="self"></link><id>http://langlv.me/</id><updated>2017-05-22T23:30:00+02:00</updated><entry><title>Victor Lv's blog</title><link href="http://langlv.me/victor-lvs-blog.html" rel="alternate"></link><published>2017-05-22T23:30:00+02:00</published><updated>2017-05-22T23:30:00+02:00</updated><author><name>Victor Lv</name></author><id>tag:langlv.me,2017-05-22:/victor-lvs-blog.html</id><summary type="html">&lt;p&gt;&lt;TOC&gt;&lt;/p&gt;
+&lt;h3&gt;用Pelican+Github搭建个人博客网站&lt;/h3&gt;
+&lt;h4&gt;1. 创建仓库&lt;/h4&gt;
+&lt;p&gt;在github上创建一个username.github.io的仓库（username是你的github用户名）    &lt;/p&gt;
+&lt;h4&gt;2. 创建index.html&lt;/h4&gt;
+&lt;p&gt;在新创建的仓库中创建一个index.html文件，随便写一句话例如Hello world!上去,然后通过访问username.github.io这个url即可看到index的内容。到这步，你就相当于可以用github pages来作为自己的个人博客了，但此时url用的还是github.io，如果需要绑定自己的域名，则需要进行第三步。  &lt;/p&gt;
+&lt;h4&gt;3. 绑定个人域名&lt;/h4&gt;
+&lt;p&gt;修改域名解析的IP地址为刚才建立的仓库的地址，获取方法是ping一下url：&lt;br&gt;
+&lt;code&gt;ping username.github.io&lt;/code&gt;&lt;br&gt;
+  这步完成后在仓库中建立一个叫做CNAME的文件，复制你的域名进去，例如我的是langlv.me&lt;br&gt;
+  至此，你就可以通过你的域名来访问该仓库的内容了，试一试吧！  &lt;/p&gt;
+&lt;h4&gt;4. 安装Pelican&lt;/h4&gt;
+&lt;p&gt;可参考：
+   &lt;a href="http://docs.getpelican.com/en/stable/quickstart.html"&gt;Pelican QuickStart&lt;/a&gt;
+   &lt;a href="http://www.jianshu.com/p/d80a5cefc128"&gt;Pelican搭建静态博客&lt;/a&gt;&lt;/p&gt;
+&lt;h4&gt;5. 使用Pelican发布文章&lt;/h4&gt;
+&lt;p&gt;安装完Pelican之后 …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;TOC&gt;&lt;/p&gt;
+&lt;h3&gt;用Pelican+Github搭建个人博客网站&lt;/h3&gt;
+&lt;h4&gt;1. 创建仓库&lt;/h4&gt;
+&lt;p&gt;在github上创建一个username.github.io的仓库（username是你的github用户名）    &lt;/p&gt;
+&lt;h4&gt;2. 创建index.html&lt;/h4&gt;
+&lt;p&gt;在新创建的仓库中创建一个index.html文件，随便写一句话例如Hello world!上去,然后通过访问username.github.io这个url即可看到index的内容。到这步，你就相当于可以用github pages来作为自己的个人博客了，但此时url用的还是github.io，如果需要绑定自己的域名，则需要进行第三步。  &lt;/p&gt;
+&lt;h4&gt;3. 绑定个人域名&lt;/h4&gt;
+&lt;p&gt;修改域名解析的IP地址为刚才建立的仓库的地址，获取方法是ping一下url：&lt;br&gt;
+&lt;code&gt;ping username.github.io&lt;/code&gt;&lt;br&gt;
+  这步完成后在仓库中建立一个叫做CNAME的文件，复制你的域名进去，例如我的是langlv.me&lt;br&gt;
+  至此，你就可以通过你的域名来访问该仓库的内容了，试一试吧！  &lt;/p&gt;
+&lt;h4&gt;4. 安装Pelican&lt;/h4&gt;
+&lt;p&gt;可参考：
+   &lt;a href="http://docs.getpelican.com/en/stable/quickstart.html"&gt;Pelican QuickStart&lt;/a&gt;
+   &lt;a href="http://www.jianshu.com/p/d80a5cefc128"&gt;Pelican搭建静态博客&lt;/a&gt;&lt;/p&gt;
+&lt;h4&gt;5. 使用Pelican发布文章&lt;/h4&gt;
+&lt;p&gt;安装完Pelican之后，创建一个Project：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir -p ~/projects/yoursite
+cd ~/projects/yoursite
+pelican-quickstart
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;执行完&lt;code&gt;pelican-quickstart&lt;/code&gt;之后会看到在yoursite文件夹自动生成了一堆东西，cd到content目录，创建一个叫index.md的markdown文件，写入内容如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Title&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;My&lt;/span&gt; &lt;span class="n"&gt;First&lt;/span&gt; &lt;span class="n"&gt;Review&lt;/span&gt;
+&lt;span class="n"&gt;Date&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2010&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;12&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;03&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;
+&lt;span class="n"&gt;Category&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Review&lt;/span&gt;
+
+&lt;span class="n"&gt;Following&lt;/span&gt; &lt;span class="k"&gt;is&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;review&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="n"&gt;my&lt;/span&gt; &lt;span class="n"&gt;favorite&lt;/span&gt; &lt;span class="n"&gt;mechanical&lt;/span&gt; &lt;span class="n"&gt;keyboard&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;cd回退一级，执行&lt;code&gt;pelican content&lt;/code&gt;,会看到output文件夹里面有一堆html和css的文件（夹），这就是根据你刚才的index.md生成的静态文件。&lt;/p&gt;
+&lt;h4&gt;6. 使用git上传静态文件&lt;/h4&gt;
+&lt;p&gt;把刚才生成的output文件夹里面的所有内容通过git上传到你刚才的仓库里去，注意执行git push之前应确保你已经git pull把云端的仓库同步到本地（因为刚才创建了CNAME文件更新了云端仓库）。上传完成之后，访问下你的域名吧！大功告成。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;本文作者个人网站：&lt;a href="http://langlv.me"&gt;Victor Lv's blog&lt;/a&gt;&lt;/strong&gt;  &lt;/p&gt;
+&lt;p&gt;另外，推荐个很棒的工具，继承了dos和linux shell命令行命令的命令行软件&lt;a href="https://github.com/cmderdev/cmder"&gt;Cmder&lt;/a&gt; 以后麻麻再也不用担心我在dos和linux命令行记忆中切换啦，直接一步到位，都用linux shell。&lt;/p&gt;
+&lt;p&gt;参考文章：&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.csdn.net/u012422829/article/details/46285577"&gt;利用Github建立你的个人网站&lt;/a&gt;
+&lt;a href="http://docs.getpelican.com/en/stable/quickstart.html"&gt;Pelican docs&lt;/a&gt;
+&lt;a href="http://www.tuicool.com/articles/6ZfEBrQ"&gt;用pelican在github上创建自己的博客!&lt;/a&gt;&lt;/p&gt;</content></entry></feed>
