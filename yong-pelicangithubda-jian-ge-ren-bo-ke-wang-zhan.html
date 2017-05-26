@@ -3,8 +3,6 @@
 <head>
           <title>Victor Lv's Blog</title>
         <meta charset="utf-8" />
-        <link href="http://langlv.me/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Victor Lv's Blog Full Atom Feed" />
-        <link href="http://langlv.me/feeds/review.atom.xml" type="application/atom+xml" rel="alternate" title="Victor Lv's Blog Categories Atom Feed" />
 
 
 
@@ -12,27 +10,27 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="http://langlv.me/">Victor Lv's Blog <strong></strong></a></h1>
+                <h1><a href="/">Victor Lv's Blog <strong></strong></a></h1>
         </header><!-- /#banner -->
         <nav id="menu"><ul>
         </ul></nav><!-- /#menu -->
 <section id="content" class="body">
   <header>
     <h2 class="entry-title">
-      <a href="http://langlv.me/victor-lvs-blog.html" rel="bookmark"
-         title="Permalink to Victor Lv's blog">Victor Lv's blog</a></h2>
+      <a href="/yong-pelicangithubda-jian-ge-ren-bo-ke-wang-zhan.html" rel="bookmark"
+         title="Permalink to 用Pelican+Github搭建个人博客网站">用Pelican+Github搭建个人博客网站</a></h2>
  
   </header>
   <footer class="post-info">
-    <time class="published" datetime="2017-05-22T23:30:00+02:00">
-      周一 22 五月 2017
+    <time class="published" datetime="2017-05-26T22:20:00+02:00">
+      周五 26 五月 2017
     </time>
     <address class="vcard author">
-      By           <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+      By           <a class="url fn" href="/author/lu-lang.html">吕浪</a>
     </address>
   </footer><!-- /.post-info -->
   <div class="entry-content">
-    <p><TOC></p>
+    <p><toc></p>
 <h3>用Pelican+Github搭建个人博客网站</h3>
 <h4>1. 创建仓库</h4>
 <p>在github上创建一个username.github.io的仓库（username是你的github用户名）    </p>
@@ -64,15 +62,16 @@ pelican-quickstart
 </pre></div>
 
 
-<p>cd回退一级，执行<code>pelican content</code>,会看到output文件夹里面有一堆html和css的文件（夹），这就是根据你刚才的index.md生成的静态文件。</p>
+<p>cd回退一级，执行<code>pelican content</code>,会看到output文件夹里面有一堆html和css的文件（夹），这就是根据你刚才的index.md生成的静态文件。<code>pelican content</code>命令是把content目录下面所有文件都转成静态文件。当更改了文件需要重新生成静态文件时，可以执行<code>make html</code>命令（在yousite目录（含Makefile文件）下），这之前需要安装make，Windows下安装教程参考：<a href="http://blog.csdn.net/pdcxs007/article/details/8582559/">Windows安装GNU编译器使用makefile</a></p>
 <h4>6. 使用git上传静态文件</h4>
 <p>把刚才生成的output文件夹里面的所有内容通过git上传到你刚才的仓库里去，注意执行git push之前应确保你已经git pull把云端的仓库同步到本地（因为刚才创建了CNAME文件更新了云端仓库）。上传完成之后，访问下你的域名吧！大功告成。</p>
-<p><strong>本文作者个人网站：<a href="http://langlv.me">Victor Lv's blog</a></strong>  </p>
 <p>另外，推荐个很棒的工具，继承了dos和linux shell命令行命令的命令行软件<a href="https://github.com/cmderdev/cmder">Cmder</a> 以后麻麻再也不用担心我在dos和linux命令行记忆中切换啦，直接一步到位，都用linux shell。</p>
 <p>参考文章：</p>
-<p><a href="http://blog.csdn.net/u012422829/article/details/46285577">利用Github建立你的个人网站</a>
-<a href="http://docs.getpelican.com/en/stable/quickstart.html">Pelican docs</a>
-<a href="http://www.tuicool.com/articles/6ZfEBrQ">用pelican在github上创建自己的博客!</a></p>
+<p><a href="http://www.wengweitao.com/shi-yong-pelican-github-pagesda-jian-ge-ren-bo-ke.html">使用Pelican + Github Pages搭建个人博客</a></p>
+<p><a href="http://blog.csdn.net/u012422829/article/details/46285577">利用Github建立你的个人网站</a></p>
+<p><a href="http://docs.getpelican.com/en/stable/quickstart.html">Pelican docs</a></p>
+<p><a href="http://www.tuicool.com/articles/6ZfEBrQ">用pelican在github上创建自己的博客!</a></p>
+<p>**本文作者为吕浪，原出处为：<a href="http://langlv.me">Victor Lv's blog</a>，转载请注明出处。</p>
   </div><!-- /.entry-content -->
 </section>
         <footer id="contentinfo" class="body">
