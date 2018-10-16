@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Title: 使用 Tesseract 进行文字识别Date: 2017-12-1 17:49Category: 技术博客Modified: 2017-12-1 17:49Tags: 文字识别Slug: TesseractAuthors: Victor LvSummary: 使用 Tesseract 进行文字识别   1. 安装 Tesseract、字库、jTessBoxEditor&amp;emsp;&amp;">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Victor Lv&#39;s blog">
+<meta property="og:url" content="http://langlv.me/blog/使用 Tesseract 进行文字识别.html">
+<meta property="og:site_name" content="Victor Lv&#39;s blog">
+<meta property="og:description" content="Title: 使用 Tesseract 进行文字识别Date: 2017-12-1 17:49Category: 技术博客Modified: 2017-12-1 17:49Tags: 文字识别Slug: TesseractAuthors: Victor LvSummary: 使用 Tesseract 进行文字识别   1. 安装 Tesseract、字库、jTessBoxEditor&amp;emsp;&amp;">
+<meta property="og:image" content="http://langlv.me/images/tesseract_cmd2.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_cmd.png">
+<meta property="og:image" content="http://langlv.me/images/jTessBox.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_cmd3.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_cmd4.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_cmd5.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_files.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_cmd6.png">
+<meta property="og:image" content="http://langlv.me/images/tesseract_final_rs.png">
+<meta property="og:updated_time" content="2018-10-12T06:48:31.824Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Victor Lv&#39;s blog">
+<meta name="twitter:description" content="Title: 使用 Tesseract 进行文字识别Date: 2017-12-1 17:49Category: 技术博客Modified: 2017-12-1 17:49Tags: 文字识别Slug: TesseractAuthors: Victor LvSummary: 使用 Tesseract 进行文字识别   1. 安装 Tesseract、字库、jTessBoxEditor&amp;emsp;&amp;">
+<meta name="twitter:image" content="http://langlv.me/images/tesseract_cmd2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://langlv.me/blog/使用 Tesseract 进行文字识别.html"/>
+
+
+
+
+
+  <title> | Victor Lv's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor Lv's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活不止眼前的代码，还有读不懂的诗和看不尽的远方</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline"></h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <p>Title: 使用 Tesseract 进行文字识别<br>Date: 2017-12-1 17:49<br>Category: 技术博客<br>Modified: 2017-12-1 17:49<br>Tags: 文字识别<br>Slug: Tesseract<br>Authors: Victor Lv<br>Summary: 使用 Tesseract 进行文字识别  </p>
+<h3 id="1-安装-Tesseract、字库、jTessBoxEditor"><a href="#1-安装-Tesseract、字库、jTessBoxEditor" class="headerlink" title="1. 安装 Tesseract、字库、jTessBoxEditor"></a>1. 安装 Tesseract、字库、jTessBoxEditor</h3><p>&emsp;&emsp;使用默认路径安装 <strong>Tesseract</strong> ，本文 Tesseract 版本3.0.5，安装的时候可手动勾选安装中文简体字库（ <strong>chi_sim.traineddata</strong>）用于识别中文，鉴于安装页面的下载速度较慢，可在安装完 Tesseract 之后再额外下载字体，在 Tesseract 的<a href="https://github.com/tesseract-ocr" target="_blank" rel="external">GitHub 主页</a>有字体大全：[tesseract-ocr][<a href="https://github.com/tesseract-ocr" target="_blank" rel="external">https://github.com/tesseract-ocr</a>]  . 把下载的字体如<code>chi_sim.traineddata</code> 放到安装目录下的<code>\tessdata\</code>目录下。添加 Tesseract 安装根目录到环境变量。另外安装 <strong>jTessBoxEditor</strong> 用于矫正识别效果从而训练自己的一套字库。</p>
+<a id="more"></a>
+<h3 id="2-识别"><a href="#2-识别" class="headerlink" title="2. 识别"></a>2. 识别</h3><p>&emsp;&emsp;Tesseract 没有图形化界面，使用的是命令行，如需图形页面，可使用第三方集成软件.<br>&emsp;&emsp;进入命令行，Windows下推荐使用<strong>git-bash</strong>，系统自带命令行可能找不到程序所在的path。首先<code>cd</code>到要识别的图片的目录下，然后输入识别命令：  </p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tesseract 图片全名 生成的结果文件的名称 <span class="_">-l</span> 字库名称</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;<code>-l</code>表示language，后面接的是字库名称，如英文字库：<code>eng</code>，中文简体字：<code>chi_sim</code>。</p>
+<p>示例：<br><figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">tesseract cardNom1.png result <span class="_">-l</span> chi_sim</div><div class="line">```  </div><div class="line">![Tesseract识别图片命令][2]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;使用的第一张图片如下，图片还比较简单，识别难度小：  </div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;![识别的图片][3]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;正常运行完上述命令之后会发现目录下生成了一个`result.txt`文件，也就是识别结果：  </div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;![识别结果][4]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;好吧，确实图片识别难度有点小了，完全无误差就识别出来了，在安装`Tesseract-3.0.5`版本之前，笔者曾使用`3.0.2`版本及其字体库识别同样的图片，并非能完全识别准确，例如会把数字`2`识别成字母`z`，看来更新版本的字体库识别率也更好些。</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;下面换成更复杂的图片，识别率就有问题了：</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;图片2：</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;![图片2][5]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;图片2识别效果如下：</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;![效果图2][6]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;图片3：</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;![图片3][7]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;图片3识别效果如下：</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;![效果图3][8]</div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;好吧，用身份证这种带条纹的测试数据就确实有点欺负人了。那么换成手写字体效果呢？手写字识别的等后面继续研究。先来看看`Tesseract`如何训练自己的字体库以期获得更高的识别准确率。下面就拿图片2 来处理。</div><div class="line"></div><div class="line"><span class="comment">### 3. 训练  </span></div><div class="line"></div><div class="line"><span class="comment">#### (a). 生成.box文件  </span></div><div class="line"></div><div class="line">&amp;emsp;&amp;emsp;因为jTessBoxEditor处理的是tif图片，所以先将jpg/png图片修改成`tif`格式（通过画图另存为或者直接修改后缀），然后运行以下命令生成`.box`文件：</div><div class="line"></div><div class="line">```bash shell</div><div class="line">tesseract 7.tif 7 <span class="_">-l</span> chi_sim batch.nochop makebox</div></pre></td></tr></table></figure></p>
+<p><img src="http://langlv.me/images/tesseract_cmd2.png" alt="生成.box文件">  </p>
+<p>&emsp;&emsp;<code>7.tif</code>就是你的tif图片，参数<code>7</code>表明生成文件的文件名，请自定义，<code>-l chi_sim</code>还是和上面一样表示使用中文简体字库。运行上述命令后会在当前目录生成<code>7.box</code>文件如下：  </p>
+<p><img src="http://langlv.me/images/tesseract_cmd.png" alt="box文件">  </p>
+<h4 id="b-使用jTessBoxEditor校正文字"><a href="#b-使用jTessBoxEditor校正文字" class="headerlink" title="(b). 使用jTessBoxEditor校正文字"></a>(b). 使用jTessBoxEditor校正文字</h4><p>&emsp;&emsp;然后我们打开<strong>jTessBoxEditor</strong> 工具（运行根目录的<code>train.bat</code>文件,或直接运行jar包：<code>java -jar jTessBoxEditor.jar</code>），导入<code>7.tif</code>文件（工具会自动找到同一目录下的<code>7.box</code>文件）逐个校正文字：  </p>
+<p>&emsp;&emsp;<img src="http://langlv.me/images/jTessBox.png" alt="jTessBoxEditor">  </p>
+<p>&emsp;&emsp;校正完毕之后 save 一下。</p>
+<h4 id="c-生成训练文件"><a href="#c-生成训练文件" class="headerlink" title="(c). 生成训练文件"></a>(c). 生成训练文件</h4><p>&emsp;&emsp;接下来运行两条命令依次生成<code>7.tr</code>文件、<code>unicharset</code>文件`：</p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tesseract 7.png 7 nobatch box.train</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">unicharset_extractor 7.box</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;然后在当前目录新建一个<code>font_propertiesx</code>新建一个font_properties文件，里面内容写入<code>normal 0 0 0 0 0</code>， <code>normal</code>表示默认你训练出来的字库的名字（就像上面的<code>chi_sim</code>），请自定义。</p>
+<p>&emsp;&emsp;接着继续运行以下命令生成<code>shapetable</code>文件：</p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">shapeclustering -F font_properties -U unicharset 7.tr</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;继续敲以下命令生成<code>inttemp</code>文件和<code>pffmtable</code>文件：    </p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mftraining -F font_properties -U unicharset -O unicharset 7.tr</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;继续敲以下命令生成<code>normproto</code>文件:  </p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cntraining 7.tr</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;上述命令集运行输出图：    </p>
+<p>&emsp;&emsp;<img src="http://langlv.me/images/tesseract_cmd3.png" alt="命令集1">   </p>
+<p>&emsp;&emsp;<img src="http://langlv.me/images/tesseract_cmd4.png" alt="命令集2">  </p>
+<p>&emsp;&emsp;<img src="http://langlv.me/images/tesseract_cmd5.png" alt="命令集2">  </p>
+<h4 id="d-合并训练文件得到新字库"><a href="#d-合并训练文件得到新字库" class="headerlink" title="(d). 合并训练文件得到新字库"></a>(d). 合并训练文件得到新字库</h4><p>&emsp;&emsp;好了，接下来把上面生成的<code>unicharset</code>、<code>inttemp</code>、<code>pffmtable</code>、<code>shapetable</code>、<code>normproto</code>这五个文件前面都加上字库名称前缀<strong><code>normal.</code></strong>，如图：  </p>
+<p><img src="http://langlv.me/images/tesseract_files.png" alt="5个文件加前缀">  </p>
+<p>&emsp;&emsp;然后运行以下命令合并这 5 个文件得到<code>normal.traineddata</code>文件，也就是我们要的训练字库：  </p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">combine_tessdata normal.</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;<img src="http://langlv.me/images/tesseract_cmd6.png" alt="命令6"></p>
+<h4 id="e-使用新字库再次识别"><a href="#e-使用新字库再次识别" class="headerlink" title="(e). 使用新字库再次识别"></a>(e). 使用新字库再次识别</h4><p>&emsp;&emsp;最后，把<code>normal.traineddata</code>复制到 Tesseract-OCR 安装目录下的<code>tessdata</code>文件夹中。然后用新字库再次识别<code>7.png</code> :</p>
+<figure class="highlight bash"><figcaption><span>shell</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tesseract 7.png 777 <span class="_">-l</span> normal</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;最后得到完美的识别效果图：  </p>
+<p>&emsp;&emsp;<img src="http://langlv.me/images/tesseract_final_rs.png" alt="完美效果图"></p>
+<p>&emsp;&emsp;</p>
+<h4 id="参考教程："><a href="#参考教程：" class="headerlink" title="参考教程："></a>参考教程：</h4><p><a href="http://www.cnblogs.com/wzben/p/5930538.html" target="_blank" rel="external">Tesseract-OCR识别中文与训练字库实例</a>  </p>
+<p><a href="https://my.oschina.net/lixinspace/blog/60124" target="_blank" rel="external">tesseract-ocr训练方法</a></p>
+<p><a href="http://blog.wudilabs.org/entry/f25efc5f/" target="_blank" rel="external">Tesseract 3 语言数据的训练方法</a>  </p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">吕浪</p>
+              <p class="site-description motion-element" itemprop="description">Victor Lv,Victor Lv's blog,吕浪,langlv,langlv.me</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-安装-Tesseract、字库、jTessBoxEditor"><span class="nav-number">1.</span> <span class="nav-text">1. 安装 Tesseract、字库、jTessBoxEditor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-识别"><span class="nav-number">2.</span> <span class="nav-text">2. 识别</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#b-使用jTessBoxEditor校正文字"><span class="nav-number">2.1.</span> <span class="nav-text">(b). 使用jTessBoxEditor校正文字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#c-生成训练文件"><span class="nav-number">2.2.</span> <span class="nav-text">(c). 生成训练文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#d-合并训练文件得到新字库"><span class="nav-number">2.3.</span> <span class="nav-text">(d). 合并训练文件得到新字库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#e-使用新字库再次识别"><span class="nav-number">2.4.</span> <span class="nav-text">(e). 使用新字库再次识别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参考教程："><span class="nav-number">2.5.</span> <span class="nav-text">参考教程：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">吕浪</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

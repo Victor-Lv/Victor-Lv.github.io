@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 站在巨人的肩膀上编程----1：深入浅出谈多态</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>站在巨人的肩膀上编程----1：深入浅出谈多态</h1>
+2017-12-06
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><p>&emsp;&emsp;本文结合示例程序分析面向编程语言的<strong>多态</strong>特性的几大作用，正因为有这几大作用，能够解决程序员在编程中遇到的一系列烦恼，所以多态才会被设计出来并被广泛应用。</p>
+<p>&emsp;&emsp;那么上述所说的程序员面对的烦恼都是哪些呢？又是如何通过多态来解决这一系列烦恼的呢？</p>
+<p>&emsp;&emsp;我个人认为，作为程序员，非常有必要<strong>知其然，且知其所以然</strong>，也就是说不仅需要熟练使用编程语言来完成编程目标，也要知道为什么要这样编程。我认为编程语言的使用者都是站在巨人的肩膀上来完成目标的，因为编程语言的发明者以及其改进者，早已对我们当前碰到的问题踩过坑或者预想过，所以在编程语言中加入了一系列特性，让后面的编程者通过该特性的运用，直接越过这一个坑，故曰：站在巨人的肩膀上编程。</p>
+<!--more-->
+
+<hr>
+<h3>多态作用一：父类引用可调用子类方法 —— 代码复用</h3>
+<p>&emsp;&emsp;举例说明，我们要对物体 sayHello，这个物体可以是一个人，也可以是一只狗或者一颗树，那么我们要定义一个 sayHello 的方法去做这件事情的话，我们可以这样写：</p>
+<div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Person</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">tellName</span> <span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;person&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Dog</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">tellName</span> <span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;dog&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sayHello</span> <span class="o">(</span><span class="n">Person</span> <span class="n">person</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">person</span><span class="o">.</span><span class="na">tellName</span><span class="o">());</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sayHello</span> <span class="o">(</span><span class="n">Dog</span> <span class="n">dog</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello &quot;</span> <span class="o">+</span> <span class="n">dog</span><span class="o">.</span><span class="na">tellName</span><span class="o">());</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;当来的是一个人，我们跟他说： <em>Hello person</em>，当来的是一只狗，我们跟他说： <em>Hello dog</em>。会发现这样写代码的话会需要定义多个同名的方法，那么能不能复用代码去完成所有这些功能呢？那就要运用到<strong>抽象</strong>，我们不管来者何人，都把它认为是一个<strong>物体：Objects</strong>，我让“看门狗”（Java虚拟机）去帮我识别来的物体是什么，专业术语谓之<strong><em>动态绑定</em></strong>，也就是程序运行时根据对象的实际类型寻找实际该调用的代码。好，“看门狗”说有个人来了，那我说：<code>Hello person</code>，“看门狗”说有棵树飞过来了，那我说：<code>Hello tree</code>……  我们把"来者“统一抽象成物体，那我们可以得到以下代码：</p>
+<div class="highlight"><pre><span></span><span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">Objects</span> <span class="o">{</span>
+
+    <span class="kd">abstract</span> <span class="kd">public</span> <span class="n">String</span> <span class="nf">tellName</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Person</span> <span class="kd">extends</span> <span class="n">Objects</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">tellName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;person&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Dog</span> <span class="kd">extends</span> <span class="n">Objects</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">tellName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;dog&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sayHello</span> <span class="o">(</span><span class="n">Objects</span> <span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hello &quot;</span><span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="na">tellName</span><span class="o">());</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;当然，前提是这个抽象的父类拥有一个子类共有的方法，例如这里是 <code>tellName</code>，实际上<strong>面向对象编程的三大特性（封装、继承、多态）</strong>中的另一个特性——继承就已经解决了这个问题，父类拥有的方法均会被子类继承，所以对于一个父类方法，使用父类引用（C++里面叫指针）一样可以去调用子类的方法，只要最终实例化的对象是子类的即可。</p>
+<hr>
+<h3>多态作用二：子类可基于父类进行拓展 —— 代码复用</h3>
+<p>&emsp;&emsp;是的，又是代码复用，程序员的“懒惰”使他埋头钻研于各类新技巧解决他的烦恼。事实上，人类制造的很多工具，都是因为他的“懒惰”，或者说为了追求更高效，为了在有限的生命绽放更大的光辉。好像扯远了……   </p>
+<p>&emsp;&emsp;因为多态这一特性，我们可以在继承父类既有的“能力”之外，还可以继续<strong>拓展</strong>我们的“能力”——方法。  </p>
+<p>&emsp;&emsp;举个例子，很久很久以前，女娲神仙和了一盘泥巴，造了一种生物（姑且叫它“植物人”），它具有心脏、大脑以及一张嘴巴，她发现“植物人”能够帮她去用大脑处理一堆问题，并能够用嘴巴说出它思考过后给出的解决方案，太牛逼了是不是。  </p>
+<p>&emsp;&emsp;后来，女娲想着，能不能有一种生物，替她去实践这些解决方案呢？于是她想到，另外造一个生物太耗费我时间了，我还得抓紧时间去做美容呢，况且，我的泥巴可珍贵着呢，可不能胡用。于是她在“植物人”的基础上，给它加上了四肢。这就不得了了，“植物人”拥有了四肢就进化成了人类，它具有行动能力，能够去办很多事情，这可让女娲神仙多省心呀……　故事讲完了，来看示例代码：   </p>
+<div class="highlight"><pre><span></span><span class="kd">class</span> <span class="nc">Body</span> <span class="o">{</span>  
+
+    <span class="kd">private</span> <span class="n">Head</span> <span class="n">head</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Mouth</span> <span class="n">mouth</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">thinking</span> <span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hey, I can think because I have head.&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">talking</span> <span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hey, I can talk because I have mouth.&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>  
+
+<span class="kd">class</span> <span class="nc">Human</span> <span class="kd">extends</span> <span class="n">Body</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">Arms</span> <span class="n">arms</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">Legs</span> <span class="n">legs</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">running</span> <span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Hey, I can run because I have arms and legs.&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;于是，当女娲神仙发现了这种好方法，她又造了一个人类的模版（<strong>抽象基类</strong>），基于此模板，添加一些特色功能，分别进化出男人和女人（<strong>实体子类</strong>），有了这种高效的方法，女娲神仙就开始了高速且源源不断的造人活动，随着一大波人类来袭，复杂的人类社会就开始了……  </p>
+<hr>
+<p>&emsp;&emsp;好了，本篇就说这两个作用吧，当然多态的作用不止于此。面向对象编程作为一种伟大的发明，其强大只有在进行大量的编程过程中，才能深有体会。在编程过程中，我们应该多去思考为什么要这样编程，我能不能按别的思路去写代码？然后也许就会顿悟：哦！原来用旧的思路写确实会增加很多代码量，使用特性能够复用很多代码。这就是所谓的<strong>站在巨人肩膀上编程</strong>，或者说：巨人们已经掉进过坑里面了，他们的身躯已经把坑给填平了…… 哈哈~ 编程就是这么有趣。</p>
+<hr>
+<p>&emsp;&emsp;参考文献： 《 Thinking in Java 》</p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/java.html">Java</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                其他
+                </li>
+           
+                <li><a href="https://github.com/Victor-Lv/">GitHub</a></li>
+                <li><a href="http://blog.csdn.net/lv_victor">CSDN博客</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+ 
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="chinese (simplified)">
 <head>
     <meta charset="utf-8">
-    <title>Victor Lv's Blog</title>
+    <title>Victor Lv's Blog - Python判断操作系统类型</title>
     <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
     <meta name="author" content="Victor Lv">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,13 +57,10 @@
     <div class="row">
 
         <div class="span9">
-        
-
-        
-
     <div class='article'>
-        <a href="http://langlv.me/demo-springMVC.html"><h2>Just a simple demo: SpringMVC + Mybatis</h2></a>
-        <div class= "well small"> 2018-08-22
+        <div class="content-title">
+            <h1>Python判断操作系统类型</h1>
+2017-05-09
 
 by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
  
@@ -71,109 +68,63 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
  Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
 
 
- </div>
-        <div class="summary"><p>Just a simple demo: SpringMVC + Mybatis</p> <a class="btn btn-info xsmall" href="http://langlv.me/demo-springMVC.html">阅读全文</a></div>
-    </div>	
-				
+        </div>
+	
+        <div><p><strong>python(2.7) check the os type running on:</strong>  </p>
+<h4>use <strong>sys.platform</strong>:</h4>
+<div class="highlight"><pre><span></span><span class="n">windows</span><span class="p">:</span>
 
-        
+    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;win32&#39;</span>
 
-    <div class='article'>
-        <a href="http://langlv.me/tools-recommend.html"><h2>优秀工具软件推荐——密码管理软件keepass</h2></a>
-        <div class= "well small"> 2018-08-14
+<span class="n">linux</span>
 
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;linux2&#39;</span>
+</pre></div>
+
+
+<!--more-->
+
+<h4>use <strong>platform.system()</strong>:</h4>
+<div class="highlight"><pre><span></span><span class="n">windows</span><span class="p">:</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">platform</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;Windows&#39;</span>
+
+<span class="n">linux</span><span class="p">:</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">platform</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="s1">&#39;Linux&#39;</span>
+</pre></div>
+
+
+<h4>Judge the os type:</h4>
+<p>We can use "=="(equal) to judge whether the os is window or linux, or we can use string.startwith() function to check it:</p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;freebsd&#39;</span><span class="p">):</span>
+    <span class="c1"># FreeBSD-specific code here...</span>
+<span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">):</span>
+    <span class="c1"># Linux-specific code here...</span>
+</pre></div>
+
+
+<p>Reference: <br>
+<a href="http://stackoverflow.com/questions/1854/python-what-os-am-i-running-on">platform — Access to underlying platform’s identifying data</a></p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
  
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>优秀工具软件推荐——密码管理软件keepass</p> <a class="btn btn-info xsmall" href="http://langlv.me/tools-recommend.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Hibernate-mybatis-use.html"><h2>Hibernate 与 Mybatis 入门使用</h2></a>
-        <div class= "well small"> 2018-07-12
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>Hibernate 与 Mybatis 入门使用</p> <a class="btn btn-info xsmall" href="http://langlv.me/Hibernate-mybatis-use.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/zibeiyuchaoyue.html"><h2>生命意义与自我主义——读《自卑与超越》有感</h2></a>
-        <div class= "well small"> 2018-01-20
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a> 
-
-
- </div>
-        <div class="summary"><p>今天阅读《自卑与超越》一书，颇有收获，尤其是第 1.3 章节的内容，正与自己近期的一些思考相关，尤其在本节末段关于爱与婚姻的一段阐述，直戳我心，猛醒自己这一年时间正是处于这种“自我主义”的心态，由此导致了一些不好的后果，给身边的一些人带来了非常不好的记忆，对此，我怀有愧疚。</p> <a class="btn btn-info xsmall" href="http://langlv.me/zibeiyuchaoyue.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Java-polymorphism.html"><h2>站在巨人的肩膀上编程----1：深入浅出谈多态</h2></a>
-        <div class= "well small"> 2017-12-06
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>本文结合示例程序分析面向编程语言的多态特性的几大作用，正因为有这几大作用，能够解决程序员在编程中遇到的一系列烦恼，所以多态才会被设计出来并被广泛应用。</p> <a class="btn btn-info xsmall" href="http://langlv.me/Java-polymorphism.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Tesseract.html"><h2>使用 Tesseract 进行文字识别</h2></a>
-        <div class= "well small"> 2017-12-01
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>使用 Tesseract 进行文字识别</p> <a class="btn btn-info xsmall" href="http://langlv.me/Tesseract.html">阅读全文</a></div>
-    </div>	
-				
-<div class="pagination">
-<ul>
-    <li class="prev disabled"><a href="#">&larr; 上一页</a></li>
-
-    <li class="active"><a href="http://langlv.me/index.html">1</a></li>
-    <li class=""><a href="http://langlv.me/index2.html">2</a></li>
-    <li class=""><a href="http://langlv.me/index3.html">3</a></li>
-    <li class=""><a href="http://langlv.me/index4.html">4</a></li>
-
-    <li class="next"><a href="http://langlv.me/index2.html">下一页 &rarr;</a></li>
-
-</ul>
-</div>
-  
+		标签 <a href="http://langlv.me/tag/python.html">python</a> 	
+    </div>
         </div>
         
 

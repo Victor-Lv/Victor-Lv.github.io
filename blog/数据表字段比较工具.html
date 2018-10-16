@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Title: 数据表字段比较工具Date: 2017-11-28 21:14Category: 技术博客Modified: 2017-11-28 21:14Tags: 数据库Slug: DB-compareAuthors: Victor LvSummary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Victor Lv&#39;s blog">
+<meta property="og:url" content="http://langlv.me/blog/数据表字段比较工具.html">
+<meta property="og:site_name" content="Victor Lv&#39;s blog">
+<meta property="og:description" content="Title: 数据表字段比较工具Date: 2017-11-28 21:14Category: 技术博客Modified: 2017-11-28 21:14Tags: 数据库Slug: DB-compareAuthors: Victor LvSummary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字">
+<meta property="og:image" content="http://langlv.me/images/dataCompare-mysql.png">
+<meta property="og:image" content="http://langlv.me/images/wampserver-index.png">
+<meta property="og:image" content="http://langlv.me/images/phpmyadmin.png">
+<meta property="og:image" content="http://langlv.me/images/dataCompare-result.png">
+<meta property="og:updated_time" content="2018-10-12T06:48:23.025Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Victor Lv&#39;s blog">
+<meta name="twitter:description" content="Title: 数据表字段比较工具Date: 2017-11-28 21:14Category: 技术博客Modified: 2017-11-28 21:14Tags: 数据库Slug: DB-compareAuthors: Victor LvSummary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字">
+<meta name="twitter:image" content="http://langlv.me/images/dataCompare-mysql.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://langlv.me/blog/数据表字段比较工具.html"/>
+
+
+
+
+
+  <title> | Victor Lv's blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Victor Lv's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活不止眼前的代码，还有读不懂的诗和看不尽的远方</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline"></h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <p>Title: 数据表字段比较工具<br>Date: 2017-11-28 21:14<br>Category: 技术博客<br>Modified: 2017-11-28 21:14<br>Tags: 数据库<br>Slug: DB-compare<br>Authors: Victor Lv<br>Summary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字段允许不一致。  </p>
+<h4 id="一、需求描述："><a href="#一、需求描述：" class="headerlink" title="一、需求描述："></a>一、需求描述：</h4><p>&emsp;&emsp;在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字段允许不一致。</p>
+<h4 id="二、设计分析："><a href="#二、设计分析：" class="headerlink" title="二、设计分析："></a>二、设计分析：</h4><p>&emsp;&emsp;功能很简单，如果表字段很少，直接用肉眼比较很快。但如果数据表的字段非常多，用肉眼一个个去比较就太费劲了。另一种不需要写代码的方法就是，把该两条数据都select出来，然后复制整行，通过诸如UltraEdit Compare等工具自动比较两个数据是否全一致，但这种方法有一个工作量就是：不一致的字段是哪些没法提示，并且也没法自动过滤白名单。既然如此，那就写个小工具程序吧。</p>
+<a id="more"></a>
+<h4 id="三、程序架构："><a href="#三、程序架构：" class="headerlink" title="三、程序架构："></a>三、程序架构：</h4><p>&emsp;&emsp;根据以上设计，容易引申出程序需要实现的几大功能：首先需要把两条数据从数据表中select出来；其次，需要逐个检查数据表的每个字段，是否一致；并且，对于不一致的字段，是否是在白名单中，如果不一致且又不在白名单中的话，则需要提示该字段不一致。笔者的主程序正是包含了三个主要函数去实现这三个点：<code>queryRecord()</code>函数用于把记录<code>select</code>出来，<code>compare()</code>函数用于比较两条记录，<code>printResult()</code>函数用于输出结果和提示。那么，先上主程序（以下程序在<code>Java8</code>下测试通过）：</p>
+<p>Compare.java :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> comparator;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@ClassName</span>: Compare</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Description</span>: A tool to compare the segment data of mysql database.</div><div class="line"> * Function description：</div><div class="line"> * 		1. Self-defined primary keys. </div><div class="line"> * 		2. Self-defined filter white list.</div><div class="line"> *  </div><div class="line"> * <span class="doctag">@Author</span>: Victor Lv (http://langlv.me)</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Email</span>: langlv@qq.com</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Date</span>: Nov 28, 2017 12:58:02 PM</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Version</span>: V1.0</div><div class="line"> * </div><div class="line"> */</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.sql.Connection;</div><div class="line"><span class="keyword">import</span> java.sql.PreparedStatement;</div><div class="line"><span class="keyword">import</span> java.sql.ResultSet;</div><div class="line"><span class="keyword">import</span> java.sql.SQLException;</div><div class="line"><span class="keyword">import</span> java.util.ArrayList;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Compare</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String CONNECT_URL = <span class="string">"jdbc:mysql://localhost:3306/test?"</span> +<span class="string">"autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8"</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String USER = <span class="string">"root"</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String PWD = <span class="string">""</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> String TABLE_NAME = <span class="string">"victor"</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> PreparedStatement psment = <span class="keyword">null</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> Connection conn =  JDBCUtil.getConnection(JDBCUtil.MYSQL_DRIVER, CONNECT_URL, USER, PWD);</div><div class="line">	</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * All column names of the table which are arranged in real order.</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> String[] columnNames = <span class="keyword">new</span> String[]&#123;</div><div class="line">            <span class="string">"pri_key"</span>,</div><div class="line">            <span class="string">"userName"</span>,</div><div class="line">            <span class="string">"phoneNumber"</span>,</div><div class="line">            <span class="string">"remark"</span></div><div class="line">            </div><div class="line">        &#125;;</div><div class="line">    </div><div class="line">    <span class="comment">/**</span></div><div class="line">     * White list for filtering, please add on demand. </div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> String[] filterList = <span class="keyword">new</span> String[]&#123;</div><div class="line">        <span class="string">"pri_key"</span>,</div><div class="line">        <span class="string">"remark"</span></div><div class="line">        </div><div class="line">    &#125;;</div><div class="line"> </div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Query record using self-defined primary keys.</div><div class="line">     * <span class="doctag">@param</span> segm1</div><div class="line">     * <span class="doctag">@param</span> segm2</div><div class="line">     * <span class="doctag">@return</span>	found record resultSet</div><div class="line">     * <span class="doctag">@throws</span> SQLException</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ResultSet <span class="title">queryRecord</span><span class="params">(String segm1, String segm2)</span> <span class="keyword">throws</span> SQLException</span>&#123;</div><div class="line">        ResultSet result = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">        String sql = <span class="string">"select * from "</span> + TABLE_NAME + <span class="string">" where userName=? and remark=?"</span>;</div><div class="line">        </div><div class="line">        System.out.println(<span class="string">"Query sql: "</span> + sql); </div><div class="line">        psment = conn.prepareStatement(sql);</div><div class="line">        psment.setString(<span class="number">1</span>, StringUtil.sqlFilter(segm1));</div><div class="line">        psment.setString(<span class="number">2</span>, StringUtil.sqlFilter(segm2));</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            result = psment.executeQuery();</div><div class="line">        &#125;<span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">            </div><div class="line">        <span class="keyword">return</span> result;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ArrayList&lt;String&gt; <span class="title">compare</span><span class="params">(ResultSet rs1, ResultSet rs2)</span> </span>&#123;</div><div class="line">        ArrayList&lt;String&gt; notEqualList = <span class="keyword">new</span> ArrayList&lt;String&gt;();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span>(rs1.next() &amp;&amp; rs2.next()) &#123;</div><div class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i =<span class="number">0</span>; i &lt; columnNames.length; i++) &#123;</div><div class="line">                    String columnName = columnNames[i];</div><div class="line">                    </div><div class="line">                    <span class="comment">/*compare specific segments of two results ,</span></div><div class="line">                    * and store into list if not equal and not in white list</div><div class="line">                    */</div><div class="line">                    <span class="keyword">if</span> (StringUtil.notEqual(rs1.getString(columnName), rs2.getString(columnName)) &amp;&amp; StringUtil.notIn(columnName,filterList))</div><div class="line">                        notEqualList.add(columnName);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (SQLException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> notEqualList;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printResult</span><span class="params">(ArrayList&lt;String&gt; list)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!list.isEmpty()) &#123;</div><div class="line">            System.out.println(<span class="string">"The different segments: "</span>);</div><div class="line">            <span class="keyword">int</span> count = <span class="number">1</span>;</div><div class="line">            <span class="keyword">for</span> (String str : list)&#123;</div><div class="line">                System.out.println(count + <span class="string">": "</span> + str);</div><div class="line">                count++;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> &#123;</div><div class="line">            System.out.println(<span class="string">"No different segments found outside the white list."</span>);</div><div class="line">        &#125;    </div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">comparator</span><span class="params">(String segm1)</span> <span class="keyword">throws</span> SQLException </span>&#123;</div><div class="line">        ResultSet rSet1 = queryRecord(segm1, <span class="string">"lvlang1"</span>);</div><div class="line">        ResultSet rSet2 = queryRecord(segm1, <span class="string">"lvlang2"</span>);</div><div class="line">        <span class="keyword">if</span>((rSet1 != <span class="keyword">null</span>) &amp;&amp; (rSet2 != <span class="keyword">null</span>))</div><div class="line">            printResult(compare(rSet1, rSet2));</div><div class="line">        <span class="keyword">else</span></div><div class="line">            System.out.println(<span class="string">"Not all the records were queried."</span>);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">        	JDBCUtil.closeConnection(rSet1, psment, conn);</div><div class="line">        	JDBCUtil.closeConnection(rSet2, psment, conn);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> SQLException </span>&#123;</div><div class="line">        comparator(<span class="string">"tony"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;作为示例，本文使用了一个很简单的数据表做示范，只有四个字段：<code>pri_key, userName, phoneNumber, remark</code>，<code>pri_key</code>作为主键允许不一致，<code>remark</code>是我用来专门区分两种造数据方法的，所以也列入白名单，同时因为数据表中存在各种途径造的数据，所以需要用一个字段判别是我们当前要测试的方法造的数据，这个字段就是<code>userName</code>，所以<code>userName</code>这个字段在两条数据中都应该是一致的，作为<code>key</code>之一用于查找数据，其他的字段（这里只剩下<code>phoneNumber</code>）则要作为检查目标，检查是否一致，如果不一致，则需要报错。  </p>
+<p>&emsp;&emsp;数据表搜寻的全字段和白名单，这里都是通过一个<code>String</code>数组来存储，注意全字段数据需要按照数据表的实际字段顺序来排，因为程序比较字段时是通过字段顺序的<code>index</code>来判断当前比较的是哪个名称的字段。白名单数组的使用则只需要将检查出来的不一致的字段去和白名单里面的既定字段比对，是否存在于白名单中，即可。</p>
+<p>&emsp;&emsp;数据表数据如下:  </p>
+<p><img src="http://langlv.me/images/dataCompare-mysql.png" alt="mysql-table"></p>
+<p>&emsp;&emsp;这里顺便推荐下wampserver自带的phpmyadmin mysql数据库管理后台，可以很方便地图形化管理mysql数据库：  </p>
+<p><img src="http://langlv.me/images/wampserver-index.png" alt="wampserver-index"></p>
+<p><img src="http://langlv.me/images/phpmyadmin.png" alt="data table"></p>
+<p>&emsp;&emsp;运行效果如下图：  </p>
+<p><img src="http://langlv.me/images/dataCompare-result.png" alt="result"></p>
+<p>&emsp;&emsp;另外，我将一些可复用的功能抽取出来作为两个工具辅助类：</p>
+<p>JDBCUtil.java :<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> comparator;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.sql.Connection;</div><div class="line"><span class="keyword">import</span> java.sql.DriverManager;</div><div class="line"><span class="keyword">import</span> java.sql.PreparedStatement;</div><div class="line"><span class="keyword">import</span> java.sql.ResultSet;</div><div class="line"><span class="keyword">import</span> java.sql.SQLException;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@ClassName</span>: JDBCUtil</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Description</span>: A tool to connection database ( mysql or db2 ..) use JDBC. </div><div class="line"> *</div><div class="line"> * <span class="doctag">@Author</span>: Victor Lv (http://langlv.me)</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Email</span>: langlv@qq.com</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Date</span>: Nov 28, 2017 12:58:02 PM</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Version</span>: V1.0</div><div class="line"> * </div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JDBCUtil</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> String MYSQL_DRIVER = <span class="string">"com.mysql.jdbc.Driver"</span>; <span class="comment">//need to import mysql-connector-java-*-bin.jar manually</span></div><div class="line">	<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> String DB2_DRIVER = <span class="string">"com.ibm.db2.jcc.DB2Driver"</span>; <span class="comment">//need to import db2-jdbc-jar manually</span></div><div class="line">	</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Create the database connection and return it.</div><div class="line">     * <span class="doctag">@param</span> DRIVER</div><div class="line">     * <span class="doctag">@param</span> URL</div><div class="line">     * <span class="doctag">@param</span> USER</div><div class="line">     * <span class="doctag">@param</span> PWD</div><div class="line">     * <span class="doctag">@return</span> connection object</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title">getConnection</span><span class="params">(String driver, String url, String user, String pwd)</span> </span>&#123;</div><div class="line">        Connection conn = <span class="keyword">null</span>;</div><div class="line">        </div><div class="line">    	<span class="keyword">try</span> &#123;</div><div class="line">    		Class.forName(driver).newInstance();	</div><div class="line">    		conn = DriverManager.getConnection(url, user, pwd);</div><div class="line">    	&#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">    		e.printStackTrace();</div><div class="line">    	&#125;</div><div class="line">        System.out.println(<span class="string">"Database connected."</span>);</div><div class="line">        <span class="keyword">return</span> conn;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Close the connection / resulSet / preparedStatement.</div><div class="line">     * <span class="doctag">@param</span> rSet</div><div class="line">     * <span class="doctag">@param</span> psment</div><div class="line">     * <span class="doctag">@param</span> conn</div><div class="line">     * <span class="doctag">@throws</span> Exception</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">closeConnection</span><span class="params">(ResultSet rSet, PreparedStatement psment, Connection conn)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    	<span class="keyword">try</span> &#123;</div><div class="line">			<span class="keyword">if</span> (rSet != <span class="keyword">null</span>) &#123;</div><div class="line">				rSet.close();</div><div class="line">				rSet = <span class="keyword">null</span>;</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">if</span> (psment != <span class="keyword">null</span>) &#123;</div><div class="line">				psment.close();</div><div class="line">				psment = <span class="keyword">null</span>;</div><div class="line">			&#125;</div><div class="line">			<span class="keyword">if</span> (conn != <span class="keyword">null</span> &amp;&amp; !conn.isClosed()) &#123;</div><div class="line">				conn.close();</div><div class="line">				conn = <span class="keyword">null</span>;</div><div class="line">			&#125;</div><div class="line">		&#125; <span class="keyword">catch</span> (SQLException e) &#123;</div><div class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> Exception(<span class="string">"Fail to close ResultSet / PreParedStatment / Connection !"</span>);</div><div class="line">		&#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>StringUtil.java :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> comparator;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@ClassName</span>: StringUtil</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Description</span>: A tool for String dealing</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Author</span>: Victor Lv (http://langlv.me)</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Email</span>: langlv@qq.com</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Date</span>: Nov 28, 2017 12:58:02 PM</div><div class="line"> *</div><div class="line"> * <span class="doctag">@Version</span>: V1.0</div><div class="line"> * </div><div class="line"> */</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringUtil</span> </span>&#123;</div><div class="line">	</div><div class="line">	</div><div class="line">	<span class="comment">/**</span></div><div class="line">	 * Judge whether two Strings are equal (trim the space of head and tail)</div><div class="line">	 * <span class="doctag">@param</span> str1</div><div class="line">	 * <span class="doctag">@param</span> str2</div><div class="line">	 * <span class="doctag">@return</span> return true if equal and return false conversely </div><div class="line">	 */</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">equal</span><span class="params">(String str1, String str2)</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (str1 == <span class="keyword">null</span> &amp; str2 == <span class="keyword">null</span>) </div><div class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">		<span class="keyword">if</span> ((str1 == <span class="keyword">null</span> &amp;&amp; str2 != <span class="keyword">null</span>) </div><div class="line">			|| (str1 != <span class="keyword">null</span> &amp; str2 ==<span class="keyword">null</span>))</div><div class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">		<span class="keyword">return</span> str1.trim().equals(str2.trim());</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">notEqual</span><span class="params">(String str1, String str2)</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> !equal(str1, str2);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">/**</span></div><div class="line">	 * Judge whether the string is in the array.</div><div class="line">	 * <span class="doctag">@param</span> str</div><div class="line">	 * <span class="doctag">@param</span> array</div><div class="line">	 * <span class="doctag">@return</span> return true if in and return false conversely</div><div class="line">	 */</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isIn</span><span class="params">(String str, String[] array)</span> </span>&#123;</div><div class="line">		<span class="keyword">for</span> (String s : array) &#123;</div><div class="line">			<span class="keyword">if</span> (equal(str, s))</div><div class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">notIn</span><span class="params">(String str, String[] array)</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> !isIn(str, array);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="comment">/**</span></div><div class="line">	 * sql injection filter</div><div class="line">	 * </div><div class="line">	 * Blog of java how to prevent sql injection：</div><div class="line">	 * 		http://www.cnblogs.com/EasonJim/p/6223216.html</div><div class="line">	 * 		http://blog.csdn.net/jun0052/article/details/8541021</div><div class="line">	 * <span class="doctag">@param</span> String to filter</div><div class="line">	 * <span class="doctag">@return</span> filtered String</div><div class="line">	 */</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">sqlFilter</span><span class="params">(String str)</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (str == <span class="keyword">null</span>)</div><div class="line">			<span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">		<span class="keyword">return</span> str.replaceAll(<span class="string">".*([';]+|(--)+).*"</span>, <span class="string">""</span>);</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这里的程序我后期额外添加了<code>sql注入</code>过滤器，纯粹是为了学习下，关于<code>java 防止sql注入</code>的方法可以参考一下两个博客：<br><a href="http://www.cnblogs.com/EasonJim/p/6223216.html" target="_blank" rel="external">java程序防止sql注入的方法</a><br><a href="http://blog.csdn.net/jun0052/article/details/8541021" target="_blank" rel="external">Java防止SQL注入（转）</a></p>
+<p>&emsp;&emsp;本文组合使用了<code>通过prepareStatement.setString()拼接字符串</code>和<code>正则表达式替换特殊字符</code>这两种方法。</p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">吕浪</p>
+              <p class="site-description motion-element" itemprop="description">Victor Lv,Victor Lv's blog,吕浪,langlv,langlv.me</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、需求描述："><span class="nav-number">1.</span> <span class="nav-text">一、需求描述：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、设计分析："><span class="nav-number">2.</span> <span class="nav-text">二、设计分析：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、程序架构："><span class="nav-number">3.</span> <span class="nav-text">三、程序架构：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">吕浪</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

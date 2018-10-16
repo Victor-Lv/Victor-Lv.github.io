@@ -2,7 +2,7 @@
 <html lang="chinese (simplified)">
 <head>
     <meta charset="utf-8">
-    <title>Victor Lv's Blog</title>
+    <title>Victor Lv's Blog - 使用markdown做本地笔记软件/编辑器</title>
     <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
     <meta name="author" content="Victor Lv">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,13 +57,10 @@
     <div class="row">
 
         <div class="span9">
-        
-
-        
-
     <div class='article'>
-        <a href="http://langlv.me/demo-springMVC.html"><h2>Just a simple demo: SpringMVC + Mybatis</h2></a>
-        <div class= "well small"> 2018-08-22
+        <div class="content-title">
+            <h1>使用markdown做本地笔记软件/编辑器</h1>
+2017-09-20
 
 by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
  
@@ -71,109 +68,24 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
  Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
 
 
- </div>
-        <div class="summary"><p>Just a simple demo: SpringMVC + Mybatis</p> <a class="btn btn-info xsmall" href="http://langlv.me/demo-springMVC.html">阅读全文</a></div>
-    </div>	
-				
+        </div>
+	
+        <div><p>&emsp;&emsp;因公司一众云笔记软件都被屏蔽用不了，只能用本地笔记，考虑到很多笔记要放图片，一开始只能用word，但那种打开速度和排版实感痛苦，所以只能是把无图片的笔记用markdown记录，有图片的用word。然而，今天才知道<strong>markdown其实是可以插入本地图片的</strong>！太棒了，那markdown作为本地笔记记录方式实在太适合了，不仅有漂亮的代码排版，字体排版，还能带目录，功能相比word效率高太多，我使用的是haroopad-markdown编辑器。
+&emsp;&emsp;插入本地图片方法很简单，直接用相对路径或绝对路径代替http-url即可，也有其他更666的方法，详见：<a href="https://www.zhihu.com/question/21065229">Markdown插入图片--知乎</a>
+&emsp;&emsp;然后发现<strong>markdown导出成html文件的功能更棒</strong>！例如我用haroopad软件把markdown文件导出成html文件会把我预览区的样式全部展示出来，唯独一点需要手工修改，那就是html的图片标签，因为默认它会把图片的源地址写成绝对路径，但一旦把图片和html文件移动到别处，那就不会显示图片了。然后我发现了个很简便的解决办法：<strong>把html文件的<code>&lt;img src&gt;</code></strong>标签修改一下，改成相对路径，例如把图片放在跟该html文件同目录下，则直接写成<code>&lt;img src=pic.jpg&gt;</code>，在另一个目录下，则写成类似<code>&lt;img src=./image/pic.jpg&gt;</code>。然后后期传输的时候只需要把html和这个图片一块传输就行了，只要这两个文件的相对路径没被改变，图片即可正确显示。
+&emsp;&emsp;然后把再<strong>通过chrome浏览器等把html直接转成pdf文件</strong>，那直接连图片都不用传输了，直接传一个pdf就足够了，非常棒！
+&emsp;&emsp;当然，也可以<strong>直接把md转pdf</strong>，可参考教程：<a href="https://www.zhihu.com/question/20849824">如何把 Markdown 文件转化为 PDF</a></p></div>
+	
+        <br>
 
-        
 
-    <div class='article'>
-        <a href="http://langlv.me/tools-recommend.html"><h2>优秀工具软件推荐——密码管理软件keepass</h2></a>
-        <div class= "well small"> 2018-08-14
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
  
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>优秀工具软件推荐——密码管理软件keepass</p> <a class="btn btn-info xsmall" href="http://langlv.me/tools-recommend.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Hibernate-mybatis-use.html"><h2>Hibernate 与 Mybatis 入门使用</h2></a>
-        <div class= "well small"> 2018-07-12
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>Hibernate 与 Mybatis 入门使用</p> <a class="btn btn-info xsmall" href="http://langlv.me/Hibernate-mybatis-use.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/zibeiyuchaoyue.html"><h2>生命意义与自我主义——读《自卑与超越》有感</h2></a>
-        <div class= "well small"> 2018-01-20
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a> 
-
-
- </div>
-        <div class="summary"><p>今天阅读《自卑与超越》一书，颇有收获，尤其是第 1.3 章节的内容，正与自己近期的一些思考相关，尤其在本节末段关于爱与婚姻的一段阐述，直戳我心，猛醒自己这一年时间正是处于这种“自我主义”的心态，由此导致了一些不好的后果，给身边的一些人带来了非常不好的记忆，对此，我怀有愧疚。</p> <a class="btn btn-info xsmall" href="http://langlv.me/zibeiyuchaoyue.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Java-polymorphism.html"><h2>站在巨人的肩膀上编程----1：深入浅出谈多态</h2></a>
-        <div class= "well small"> 2017-12-06
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>本文结合示例程序分析面向编程语言的多态特性的几大作用，正因为有这几大作用，能够解决程序员在编程中遇到的一系列烦恼，所以多态才会被设计出来并被广泛应用。</p> <a class="btn btn-info xsmall" href="http://langlv.me/Java-polymorphism.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Tesseract.html"><h2>使用 Tesseract 进行文字识别</h2></a>
-        <div class= "well small"> 2017-12-01
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>使用 Tesseract 进行文字识别</p> <a class="btn btn-info xsmall" href="http://langlv.me/Tesseract.html">阅读全文</a></div>
-    </div>	
-				
-<div class="pagination">
-<ul>
-    <li class="prev disabled"><a href="#">&larr; 上一页</a></li>
-
-    <li class="active"><a href="http://langlv.me/index.html">1</a></li>
-    <li class=""><a href="http://langlv.me/index2.html">2</a></li>
-    <li class=""><a href="http://langlv.me/index3.html">3</a></li>
-    <li class=""><a href="http://langlv.me/index4.html">4</a></li>
-
-    <li class="next"><a href="http://langlv.me/index2.html">下一页 &rarr;</a></li>
-
-</ul>
-</div>
-  
+		标签 <a href="http://langlv.me/tag/bi-ji.html">笔记</a> <a href="http://langlv.me/tag/markdown.html">markdown</a> 	
+    </div>
         </div>
         
 

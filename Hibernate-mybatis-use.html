@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - Hibernate 与 Mybatis 入门使用</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>Hibernate 与 Mybatis 入门使用</h1>
+2018-07-12
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><h2>1. Hibernate -- 基于 Hibernate 5.3.1 final</h2>
+<h3>Hibernate 核心配置文件 hibernate.cfg.xml</h3>
+<p>hibernate.cfg.xml 是必备的配置文件，用于配置数据库连接信息（包括我们在 JDBC 中用到的 driver、url、username、password 以及其他的连接配置），以及指定 ORM 配置文件路径。示例如下：</p>
+<!--more-->
+
+<p><strong>hibernate.cfg.xml：</strong></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE hibernate-configuration PUBLIC</span>
+<span class="cp">&quot;-//Hibernate/Hibernate Configuration DTD 3.0//EN&quot;</span>
+<span class="cp">&quot;http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd&quot;&gt;</span>
+<span class="nt">&lt;hibernate-configuration&gt;</span>
+    <span class="nt">&lt;session-factory&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.connection.driver_class&quot;</span><span class="nt">&gt;</span>com.mysql.jdbc.Driver<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.connection.url&quot;</span><span class="nt">&gt;</span>jdbc:mysql://localhost:3306/lvlang?&quot; +&quot;autoReconnect=true<span class="ni">&amp;amp;</span>useUnicode=true<span class="ni">&amp;amp;</span>characterEncoding=UTF-8<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.connection.username&quot;</span><span class="nt">&gt;</span>root<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.connection.password&quot;</span><span class="nt">&gt;</span>123456<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.show_sql&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.format_sql&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.dialect&quot;</span><span class="nt">&gt;</span>org.hibernate.dialect.MySQLDialect<span class="nt">&lt;/property&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;hibernate.use_sql_comments&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/property&gt;</span>
+
+        <span class="c">&lt;!-- 指定 ORM 配置文件 --&gt;</span>
+        <span class="nt">&lt;mapping</span> <span class="na">resource=</span><span class="s">&quot;config/User.hbm.xml&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;mapping</span> <span class="na">resource=</span><span class="s">&quot;config/Student.hbm.xml&quot;</span> <span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;/session-factory&gt;</span>
+<span class="nt">&lt;/hibernate-configuration&gt;</span>
+</pre></div>
+
+
+<p>另外，hibernate.cfg.xml 须置于 工程或 classpath <strong>根目录</strong>才能让程序找到它。本文测试工程结构如下（使用IntelliJ IDEA）：
+<img alt="Hibernate 测试工程结构" src="http://langlv.me/images/hibernate_project.png"></p>
+<h3>ORM 配置文件 ClassName.hbm.xml ：</h3>
+<p>Hibernate 作为一个 ORM （Object  Relational Mapping -- 对象--关系型数据库 映射），它使用 ClassName.hbm.xml 配置文件来作为 数据库表 和 Java类的映射配置，本文以两个简单的数据表 （User 和 Student 表）为例，表结构如下：
+<img alt="User 和 Student 表" src="http://langlv.me/images/userAndStudentTable.png"></p>
+<p>其中 User 表对应的映射文件 <strong>User.hbm.xml</strong> 如下：</p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE hibernate-mapping PUBLIC </span>
+<span class="cp">    &quot;-//Hibernate/Hibernate Mapping DTD 3.0//EN&quot;</span>
+<span class="cp">    &quot;http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd&quot;&gt;</span>
+<span class="nt">&lt;hibernate-mapping</span> <span class="na">package=</span><span class="s">&quot;hibernate&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- Table: User --&gt;</span>
+    <span class="nt">&lt;class</span> <span class="na">name=</span><span class="s">&quot;User&quot;</span> <span class="na">table=</span><span class="s">&quot;User&quot;</span> <span class="na">catalog=</span><span class="s">&quot;lvlang&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;id</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">column=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span> <span class="nt">&gt;</span>
+            <span class="c">&lt;!-- Declaim that the primary key is auto-generated --&gt;</span>
+            <span class="nt">&lt;generator</span> <span class="na">class=</span><span class="s">&quot;native&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/id&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">column=</span><span class="s">&quot;name&quot;</span> <span class="na">length=</span><span class="s">&quot;20&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;address&quot;</span> <span class="na">column=</span><span class="s">&quot;address&quot;</span> <span class="na">length=</span><span class="s">&quot;50&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/class&gt;</span>
+<span class="nt">&lt;/hibernate-mapping&gt;</span>
+</pre></div>
+
+
+<p><em><generator class="native" /></em> 表示该主键元素值由数据库自动生成。</p>
+<p>Student 表对应的映射文件 <strong>Student.hbm.xml</strong> 如下：</p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cp">&lt;!DOCTYPE hibernate-mapping PUBLIC</span>
+<span class="cp">        &quot;-//Hibernate/Hibernate Mapping DTD 3.0//EN&quot;</span>
+<span class="cp">        &quot;http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd&quot;&gt;</span>
+<span class="nt">&lt;hibernate-mapping</span> <span class="na">package=</span><span class="s">&quot;hibernate&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- Table: Student --&gt;</span>
+    <span class="nt">&lt;class</span> <span class="na">name=</span><span class="s">&quot;Student&quot;</span>  <span class="na">table=</span><span class="s">&quot;Student&quot;</span> <span class="na">catalog=</span><span class="s">&quot;lvlang&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;composite-id</span> <span class="na">name=</span><span class="s">&quot;StudentID&quot;</span> <span class="na">class=</span><span class="s">&quot;StudentID&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;key-property</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="nt">/&gt;</span>
+                <span class="c">&lt;!-- Declaim that the primary key is auto-generated --&gt;</span>
+            <span class="nt">&lt;/key-property&gt;</span>
+            <span class="nt">&lt;key-property</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.String&quot;</span> <span class="na">length=</span><span class="s">&quot;20&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="nt">/&gt;</span>
+            <span class="nt">&lt;/key-property&gt;</span>
+        <span class="nt">&lt;/composite-id&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;address&quot;</span> <span class="na">column=</span><span class="s">&quot;address&quot;</span> <span class="na">type=</span><span class="s">&quot;java.lang.String&quot;</span> <span class="na">length=</span><span class="s">&quot;100&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;score&quot;</span> <span class="na">column=</span><span class="s">&quot;score&quot;</span> <span class="na">type=</span><span class="s">&quot;int&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/class&gt;</span>
+<span class="nt">&lt;/hibernate-mapping&gt;</span>
+</pre></div>
+
+
+<p>Hibernate 的 ORM 配置文件一目了然，这是它的一个优势。</p>
+<h3>映射类 ClassName.java</h3>
+<p>ORM 中的 数据表有了，映射关系也配置好了，就剩实现对应的 Java 类了：
+<strong>User.java</strong>：</p>
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * @ClassName: User.java</span>
+<span class="cm"> * @Description:</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Email: langlv@qq.com</span>
+<span class="cm"> * @Date: Jul 2, 2018</span>
+<span class="cm"> * @Version: V1.0</span>
+<span class="cm"> */</span>
+<span class="kn">package</span> <span class="nn">hibernate</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: User.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">address</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the id</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param id the id to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the name</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param name the name to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the address</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAddress</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param address the address to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAddress</span><span class="o">(</span><span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;User {id=&quot;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&quot;, name=&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;}&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><strong>Student.java</strong>，Student 表使用了复合主键，所以它的 primary key 在这里用专用的类封装了：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">hibernate</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: Student</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/11 11:24</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">StudentID</span> <span class="n">studentID</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">address</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">score</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Student</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">Student</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">,</span> <span class="kt">int</span> <span class="n">score</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">StudentID</span> <span class="n">ID</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StudentID</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">studentID</span> <span class="o">=</span> <span class="n">ID</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">score</span> <span class="o">=</span> <span class="n">score</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">Student</span><span class="o">(</span><span class="n">StudentID</span> <span class="n">ID</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">,</span> <span class="kt">int</span> <span class="n">score</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">studentID</span> <span class="o">=</span> <span class="n">ID</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">score</span> <span class="o">=</span> <span class="n">score</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">StudentID</span> <span class="nf">getStudentID</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">studentID</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setStudentID</span><span class="o">(</span><span class="n">StudentID</span> <span class="n">studentID</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">studentID</span> <span class="o">=</span> <span class="n">studentID</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAddress</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getScore</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">score</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAddress</span><span class="o">(</span><span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setScore</span><span class="o">(</span><span class="kt">int</span> <span class="n">score</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">score</span> <span class="o">=</span> <span class="n">score</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;Student{id = &quot;</span> <span class="o">+</span> <span class="n">getStudentID</span><span class="o">().</span><span class="na">getId</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot; name = &quot;</span> <span class="o">+</span> <span class="n">getStudentID</span><span class="o">().</span><span class="na">getName</span><span class="o">()</span>
+                <span class="o">+</span> <span class="s">&quot; address = &quot;</span> <span class="o">+</span> <span class="n">getAddress</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot; score = &quot;</span> <span class="o">+</span> <span class="n">getScore</span><span class="o">()</span> <span class="o">+</span><span class="s">&quot; }&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>对应的 <strong>StudentID.java</strong>：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">hibernate</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: StudentID</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/11 11:16</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentID</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">StudentID</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">StudentID</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>SessionFactory——Session 生产工厂</h3>
+<p>一个 session 就是客户端与服务器的一次会话，SessionFactory 的存在使得 session 的建立变得轻便，好比一壶配好了茶叶的茶，需要时从壶里倒一杯出来即可，请君品鉴，而不是来了一位新客人就得重头开始泡一壶茶。</p>
+<p>Hibernate 的SessionFactory 和 Session 管理非常简便，下述 MySessionFactory.java 封装 SessionFactory 的建立和 Session 的获取功能，SessionFactory 仅需一个，所以定义成 static 属性，在类加载时即建立。</p>
+<p><strong>MySessionFactory.java：</strong></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">hibernate</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.hibernate.Session</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.hibernate.SessionFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.hibernate.cfg.Configuration</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: MySessionFactory.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MySessionFactory</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">SessionFactory</span> <span class="n">sessionFactory</span><span class="o">;</span>
+
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="c1">//1. find and import the hibernate.cfg.xml configuration</span>
+        <span class="n">Configuration</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Configuration</span><span class="o">().</span><span class="na">configure</span><span class="o">();</span>
+
+        <span class="c1">//2. build session factory</span>
+        <span class="n">sessionFactory</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="na">buildSessionFactory</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Session</span> <span class="nf">getSession</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">sessionFactory</span><span class="o">.</span><span class="na">openSession</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>简单使用--HibernateTest</h3>
+<p>茶已泡好了一壶，万事胥备，就等客人了。session 的管理尚有 beginTransaction （打开茶壶盖）、 commit （倒茶入杯） 、 close session（合上茶壶盖） 这一系列固定流程，那再雇佣一个服务员来做这一系列的事吧，就叫它 Mysession.java ：</p>
+<p><strong>MySession.java：</strong></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">hibernate</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.hibernate.Session</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: MySession</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 17:23</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MySession</span> <span class="o">{</span>
+
+    <span class="cm">/* 加双重校验锁的懒汉单例模式：</span>
+<span class="cm">    (参考：https://blog.csdn.net/goodlixueyong/article/details/51935526)</span>
+
+<span class="cm">    1、volatile保证了uniqueInstance的修改对各个线程的可见性。</span>
+
+<span class="cm">    2、这是个static方法synchronized(this)肯定是不行的，因为没有this(this针对的是实例化对象)。</span>
+<span class="cm">        再说synchronized(uniqueInstance)，synchronized是针对对象而言的，对象都是堆里的对象，</span>
+<span class="cm">        但是初始化状态下uniqueInstance是null，只是栈里的一个标识，在堆里没有。</span>
+<span class="cm">        synchronized(null)会报空指针异常。</span>
+<span class="cm">     */</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">volatile</span> <span class="n">MySession</span> <span class="n">instance</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">MySession</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">==</span> <span class="n">instance</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="n">MySession</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//synchronized 保证了一次只有一个线程能进入下面的代码块</span>
+
+                <span class="cm">/* 双重校验锁：因为上头的 if (null == instance) 无线程锁，</span>
+<span class="cm">                    假设线程 A 和 B 同时越过了上头的校验，来到了 synchronized 代码块，</span>
+<span class="cm">                    线程 A 先执行了代码块并 new 了一个 instance ，</span>
+<span class="cm">                    然后线程 B 进来了，如果此处不加双重校验，那么线程 B 会认为 (null == instance) 仍然是成立的，</span>
+<span class="cm">                    所以线程 B 也 new 了一个 instance。</span>
+<span class="cm">                 */</span>
+                <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">==</span> <span class="n">instance</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">return</span> <span class="k">new</span> <span class="n">MySession</span><span class="o">();</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">instance</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="n">Object</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span><span class="o">,</span> <span class="n">String</span> <span class="n">command</span><span class="o">,</span> <span class="n">Serializable</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//3. open (create) a session (DB connection)</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">MySessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="c1">//4. begin transaction</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">beginTransaction</span><span class="o">();</span>
+
+        <span class="c1">//5. execute the task</span>
+        <span class="n">Object</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Object</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="s">&quot;add&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">command</span><span class="o">))</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">object</span><span class="o">);</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="s">&quot;update&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">command</span><span class="o">))</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">object</span><span class="o">);</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="s">&quot;delete&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">command</span><span class="o">))</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">object</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="s">&quot;load&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">command</span><span class="o">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">object</span><span class="o">.</span><span class="na">getClass</span><span class="o">(),</span> <span class="n">id</span><span class="o">);</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="s">&quot;get&quot;</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">command</span><span class="o">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">object</span><span class="o">.</span><span class="na">getClass</span><span class="o">(),</span> <span class="n">id</span><span class="o">);</span>
+
+        <span class="c1">//6. commit the transaction</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">commit</span><span class="o">();</span>
+
+        <span class="c1">//7. close session</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+
+        <span class="c1">//8. close session factory</span>
+<span class="c1">//        sessionFactory.close();</span>
+
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">execute</span><span class="o">(</span><span class="n">object</span><span class="o">,</span> <span class="s">&quot;add&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">update</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">execute</span><span class="o">(</span><span class="n">object</span><span class="o">,</span> <span class="s">&quot;update&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">execute</span><span class="o">(</span><span class="n">object</span><span class="o">,</span> <span class="s">&quot;delete&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">load</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span><span class="o">,</span> <span class="n">Serializable</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">execute</span><span class="o">(</span><span class="n">object</span><span class="o">,</span> <span class="s">&quot;load&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">get</span><span class="o">(</span><span class="n">Object</span> <span class="n">object</span><span class="o">,</span> <span class="n">Serializable</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">execute</span><span class="o">(</span><span class="n">object</span><span class="o">,</span> <span class="s">&quot;get&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>下面就是客人来喝茶了，写了几个简单的 Hibernate 使用样例：</p>
+<p><strong>HibernateTest.java：</strong></p>
+<div class="highlight"><pre><span></span>    <span class="kn">package</span> <span class="nn">hibernate</span><span class="o">;</span>
+
+    <span class="kn">import</span> <span class="nn">org.hibernate.Session</span><span class="o">;</span>
+
+    <span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @ClassName: HibernateTest.java</span>
+<span class="cm">     * @Description: TODO</span>
+<span class="cm">     * @Author: http://langlv.me</span>
+<span class="cm">     * @Date: 2018/7/10 15:44</span>
+<span class="cm">     * @Version: 1.0</span>
+<span class="cm">     */</span>
+
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nc">HibernateTest</span> <span class="o">{</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">userTest</span><span class="o">();</span>
+            <span class="n">studentTest</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">userTest</span><span class="o">()</span> <span class="o">{</span>
+            <span class="c1">//----- 1. User table ------</span>
+            <span class="c1">// add one data</span>
+            <span class="n">User</span> <span class="n">userAdd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="s">&quot;Victor&quot;</span><span class="o">,</span> <span class="s">&quot;Guangdong&quot;</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">userAdd</span><span class="o">);</span>
+
+            <span class="c1">// query data</span>
+            <span class="n">User</span> <span class="n">myUser1</span> <span class="o">=</span> <span class="o">(</span><span class="n">User</span><span class="o">)</span> <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="k">new</span> <span class="n">User</span><span class="o">(),</span> <span class="mi">1</span><span class="o">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myUser1</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+            <span class="c1">// update data</span>
+            <span class="n">User</span> <span class="n">userUpdate</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">,</span> <span class="s">&quot;Beijing&quot;</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">update</span><span class="o">(</span><span class="n">userUpdate</span><span class="o">);</span>
+
+            <span class="c1">// query data</span>
+            <span class="n">User</span> <span class="n">myUser2</span> <span class="o">=</span> <span class="o">(</span><span class="n">User</span><span class="o">)</span> <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="k">new</span> <span class="n">User</span><span class="o">(),</span> <span class="mi">1</span><span class="o">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myUser2</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+            <span class="c1">// delete one data</span>
+            <span class="n">User</span> <span class="n">userDelete</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">delete</span><span class="o">(</span><span class="n">userDelete</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">studentTest</span><span class="o">()</span> <span class="o">{</span>
+            <span class="c1">//----- 2. Student table ------</span>
+            <span class="c1">// add data</span>
+            <span class="n">Student</span> <span class="n">studentAdd1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">,</span> <span class="s">&quot;New-York&quot;</span><span class="o">,</span> <span class="mi">100</span><span class="o">);</span>
+            <span class="n">Student</span> <span class="n">studentAdd2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&quot;Tony&quot;</span><span class="o">,</span> <span class="s">&quot;Beijing&quot;</span><span class="o">,</span> <span class="mi">99</span><span class="o">);</span>
+            <span class="n">Student</span> <span class="n">studentAdd3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&quot;Victor&quot;</span><span class="o">,</span> <span class="s">&quot;Shanghai&quot;</span><span class="o">,</span> <span class="mi">98</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">studentAdd1</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">studentAdd2</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">studentAdd3</span><span class="o">);</span>
+
+            <span class="c1">//query data</span>
+            <span class="n">StudentID</span> <span class="n">ID1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StudentID</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">);</span>
+            <span class="n">Student</span> <span class="n">myStudent1</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span> <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="k">new</span> <span class="n">Student</span><span class="o">(),</span> <span class="n">ID1</span><span class="o">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">((</span><span class="kc">null</span> <span class="o">==</span> <span class="n">myStudent1</span><span class="o">)</span> <span class="o">?</span> <span class="s">&quot;Empty&quot;</span> <span class="o">:</span> <span class="n">myStudent1</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+            <span class="c1">//update data</span>
+            <span class="n">Student</span> <span class="n">studentUpdate</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">,</span> <span class="s">&quot;Miami&quot;</span><span class="o">,</span> <span class="mi">95</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">update</span><span class="o">(</span><span class="n">studentUpdate</span><span class="o">);</span>
+
+            <span class="c1">//query data</span>
+            <span class="n">StudentID</span> <span class="n">ID2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StudentID</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">);</span>
+            <span class="n">Student</span> <span class="n">myStudent2</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span> <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="k">new</span> <span class="n">Student</span><span class="o">(),</span> <span class="n">ID2</span><span class="o">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">((</span><span class="kc">null</span> <span class="o">==</span> <span class="n">myStudent2</span><span class="o">)</span> <span class="o">?</span> <span class="s">&quot;Empty&quot;</span> <span class="o">:</span> <span class="n">myStudent2</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+            <span class="c1">//delete data</span>
+            <span class="n">Student</span> <span class="n">studentDelete</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&quot;Tony&quot;</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+            <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">delete</span><span class="o">(</span><span class="n">studentDelete</span><span class="o">);</span>
+
+            <span class="c1">//query data</span>
+            <span class="n">StudentID</span> <span class="n">ID3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StudentID</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&quot;Tony&quot;</span><span class="o">);</span>
+            <span class="n">Student</span> <span class="n">myStudent3</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span> <span class="n">MySession</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="k">new</span> <span class="n">Student</span><span class="o">(),</span> <span class="n">ID3</span><span class="o">);</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">((</span><span class="kc">null</span> <span class="o">==</span> <span class="n">myStudent3</span><span class="o">)</span> <span class="o">?</span> <span class="s">&quot;Empty&quot;</span> <span class="o">:</span> <span class="n">myStudent3</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="o">}</span>
+
+    <span class="o">}</span>
+</pre></div>
+
+
+<p>对于入门级别的简单使用，Hibernate 的整个流程下来一气呵成，干练明了，一条 SQL 语句也不用写，只是在使用 Session 的诸如 get、load、save、update、delete 等各种方法时有点小纠结。</p>
+<h2>2. Mybatis —— 基于 Mybatis-3.4.6</h2>
+<h3>MyBatis 核心配置文件</h3>
+<p>与 Hibernate 类似，Mybatis 也需要一个配置数据库连接信息的核心配置文件，但它的名字和路径就相对自由，因为后续使用该配置文件的时候需要手工引入。配置如下：</p>
+<p><strong>config.xml：</strong></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE configuration</span>
+<span class="cp">        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span>
+<span class="cp">        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+
+    <span class="c">&lt;!-- 引入外部配置文件 --&gt;</span>
+    <span class="nt">&lt;properties</span> <span class="na">resource=</span><span class="s">&quot;DBConfig.properties&quot;</span><span class="nt">&gt;&lt;/properties&gt;</span>
+
+    <span class="nt">&lt;environments</span> <span class="na">default=</span><span class="s">&quot;development&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;environment</span> <span class="na">id=</span><span class="s">&quot;development&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;transactionManager</span> <span class="na">type=</span><span class="s">&quot;JDBC&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;dataSource</span> <span class="na">type=</span><span class="s">&quot;POOLED&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;driver&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.driverClass}&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;url&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.url}&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.userName}&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.userPassword}&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/dataSource&gt;</span>
+        <span class="nt">&lt;/environment&gt;</span>
+    <span class="nt">&lt;/environments&gt;</span>
+
+    <span class="nt">&lt;mappers&gt;</span>
+        <span class="nt">&lt;mapper</span> <span class="na">resource=</span><span class="s">&quot;UserMapper.xml&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/mappers&gt;</span>
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+
+
+<p>这里把数据库的 driverClass、url、username 等信息配置成从外部配置文件 DBConfig.properties 读取：</p>
+<p><strong>DBConfig.properties：</strong></p>
+<div class="highlight"><pre><span></span>JDBC.driverClass=com.mysql.jdbc.Driver
+JDBC.url=jdbc:mysql://localhost:3306/lvlang?autoReconnect=true<span class="ni">&amp;amp;</span>useUnicode=true<span class="ni">&amp;amp;</span>characterEncoding=UTF-8
+JDBC.userName=root
+JDBC.userPassword=123456
+</pre></div>
+
+
+<p>本文的测试工程结构如下（使用 Maven 工程形式）：</p>
+<p><img alt="Mybatis 测试工程结构" src="http://langlv.me/images/mybatis_project.png"></p>
+<h3>ORM 配置文件—— xxxMapper.xml</h3>
+<p>上述 <code>config.xml</code> 配置指定了一个映射关系配置文件 UserMapper.xml ，配置了 User 表（表结构和上述的例子相同）的SQL操作映射关系：</p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE mapper</span>
+<span class="cp">        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span>
+<span class="cp">        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span>
+<span class="nt">&lt;mapper</span> <span class="na">namespace=</span><span class="s">&quot;UserMapper&quot;</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;selectUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;int&quot;</span> <span class="na">resultType=</span><span class="s">&quot;mybatis.User&quot;</span><span class="nt">&gt;</span>
+        SELECT * FROM User WHERE id = #{id}
+    <span class="nt">&lt;/select&gt;</span>
+
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;selectUserName&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;int&quot;</span> <span class="na">resultType=</span><span class="s">&quot;mybatis.User&quot;</span><span class="nt">&gt;</span>
+        SELECT name FROM User WHERE id = #{id}
+    <span class="nt">&lt;/select&gt;</span>
+
+    <span class="nt">&lt;insert</span> <span class="na">id=</span><span class="s">&quot;insertUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;mybatis.User&quot;</span> <span class="na">useGeneratedKeys=</span><span class="s">&quot;true&quot;</span> <span class="na">keyProperty=</span><span class="s">&quot;id&quot;</span><span class="nt">&gt;</span>
+        insert into user (name, address)
+                VALUES (#{name}, #{address})
+    <span class="nt">&lt;/insert&gt;</span>
+
+    <span class="nt">&lt;delete</span> <span class="na">id=</span><span class="s">&quot;deleteUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;int&quot;</span> <span class="nt">&gt;</span>
+        DELETE FROM user WHERE id = #{id}
+    <span class="nt">&lt;/delete&gt;</span>
+
+    <span class="nt">&lt;update</span> <span class="na">id=</span><span class="s">&quot;updateUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;mybatis.User&quot;</span><span class="nt">&gt;</span>
+        UPDATE user set
+            name = #{name},
+            address = #{address}
+        where id = #{id}
+    <span class="nt">&lt;/update&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</pre></div>
+
+
+<p>与 Hibernate 的映射关系配置文件不一样，Mybatis 的这个配置文件主要配置的是 SQL 语句的 key-value 选项，也就是通过唯一的 key - String，能拉出来对应的 SQL 语句出来执行，同时在该配置文件中指定 SQL 传入参数信息（比如参数类型）以及 resultMap 对应的 POJO 映射。
+Hibernate 提供了 SQL 语句层的封装，可以将数据库操作自动生成 SQL 语句（也提供 HQL 的方式编写自定义 SQL），对于简单的数据库操作非常方便；而 Mybatis 则交由程序员自行编写 SQL 语句，灵活性更大。两个框架的这个特性的差异，也引发了网络上就这两个框架的开发效率、性能、可拓展性等展开过热议。</p>
+<h3>映射类 -- User.java</h3>
+<p><strong>User.java：</strong></p>
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * @ClassName: User.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kn">package</span> <span class="nn">mybatis</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">address</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the id</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param id the id to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the name</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param name the name to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the address</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAddress</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param address the address to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAddress</span><span class="o">(</span><span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;User [id=&quot;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&quot;, name=&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span><span class="s">&quot;, address= &quot;</span> <span class="o">+</span> <span class="n">address</span> <span class="o">+</span> <span class="s">&quot; ]&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>SessionFactory</h3>
+<p>与 Hibernate 自动读取根目录的 hibernate.cfg.xml 配置来产生 SessionFactory 不同，Mybatis 引入核心配置的方式更多样，比如下述样例，读取指定的配置文件成 <code>InputStream</code>，再用这个 <code>InputStream</code>构造出一个 SessionFactory：</p>
+<p><strong>SessionFactory.java：</strong></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">mybatis</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.io.Resources</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSessionFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSessionFactoryBuilder</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.InputStream</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: SessionFactory.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SessionFactory</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">SqlSessionFactory</span> <span class="n">sqlSessionFactory</span><span class="o">;</span>
+
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">resource</span> <span class="o">=</span> <span class="s">&quot;config.xml&quot;</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">InputStream</span> <span class="n">inputStream</span> <span class="o">=</span> <span class="n">Resources</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="n">resource</span><span class="o">);</span>
+            <span class="n">sqlSessionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SqlSessionFactoryBuilder</span><span class="o">().</span><span class="na">build</span><span class="o">(</span><span class="n">inputStream</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">SqlSession</span> <span class="nf">getSession</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">sqlSessionFactory</span><span class="o">.</span><span class="na">openSession</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>Mybatis 简单使用 -- MybatisTest</h3>
+<p>茶已泡好，请君入席：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">mybatis</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: MybatisTest.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MybatisTest</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">arg</span><span class="o">[])</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+        <span class="n">User</span> <span class="n">myUser1</span> <span class="o">=</span> <span class="n">selectUserName</span><span class="o">(</span><span class="mi">7</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myUser1</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Insert user: &quot;</span> <span class="o">+</span> <span class="n">insertUser</span><span class="o">(</span><span class="s">&quot;langlv&quot;</span><span class="o">,</span> <span class="s">&quot;China&quot;</span><span class="o">));</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Update user: &quot;</span> <span class="o">+</span> <span class="n">updateUser</span><span class="o">(</span><span class="mi">7</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">,</span> <span class="s">&quot;Beijing&quot;</span><span class="o">));</span>
+        <span class="n">User</span> <span class="n">myUser2</span> <span class="o">=</span> <span class="n">selectUser</span><span class="o">(</span><span class="mi">7</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">myUser2</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Delete User: &quot;</span> <span class="o">+</span> <span class="n">deleteUser</span><span class="o">(</span><span class="mi">12</span><span class="o">));</span>
+
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">User</span> <span class="nf">selectUserName</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Selecting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="o">(</span><span class="n">User</span><span class="o">)</span> <span class="n">session</span><span class="o">.</span><span class="na">selectOne</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="s">&quot;UserMapper.selectUserName&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+<span class="c1">//                System.out.println(user.toString());</span>
+                <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+<span class="c1">//                System.out.println(&quot;Not found!&quot;);</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">User</span> <span class="nf">selectUser</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Selecting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="o">(</span><span class="n">User</span><span class="o">)</span> <span class="n">session</span><span class="o">.</span><span class="na">selectOne</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="s">&quot;UserMapper.selectUser&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+<span class="c1">//                System.out.println(user.toString());</span>
+                <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+<span class="c1">//                System.out.println(&quot;Not found!&quot;);</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">insertUser</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Inserting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">address</span><span class="o">);</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="s">&quot;UserMapper.insertUser&quot;</span><span class="o">,</span> <span class="n">user1</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">updateUser</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Updating user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">address</span><span class="o">);</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="s">&quot;UserMapper.updateUser&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">deleteUser</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Deleting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="s">&quot;UserMapper.deleteUser&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>与 Hibernate 每次启动数据库操作都得传入整个 POJO 类/对象不同，Mybatis 的理念是，你给我一串 SQL 和传入参数就好，我帮你组装成一条完成的 SQL 拿去 JDBC 运行，Hibernate 则是拿到传入的这个类/对象，自动拼接其成员属性生成 SQL。Hibernate 更省事，Mybatis 更灵活（比如需要写定制化的 SQL）。</p>
+<h3>结语</h3>
+<p>本文只简述 Hibernate 和 Mybatis 两个 ORM 框架的入门使用。针对二者的 PK ，网上的各家议论见仁见智。只能说一方面要因地制宜，应场景需求挑选框架；另一方面要得心应手，自己用的顺手顺心，也是挺重要的。</p>
+<p><strong>参考文章</strong>：
+<a href="https://blog.csdn.net/yerenyuan_pku/article/details/64209343">Hibernate快速入门</a>
+<a href="http://www.mybatis.org/mybatis-3/zh/index.html">Mybatis 3 简介</a></p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/java-web.html">Java-Web</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                其他
+                </li>
+           
+                <li><a href="https://github.com/Victor-Lv/">GitHub</a></li>
+                <li><a href="http://blog.csdn.net/lv_victor">CSDN博客</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+ 
+</body>
+</html>
