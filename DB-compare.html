@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 数据表字段比较工具</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>数据表字段比较工具</h1>
+2017-11-28
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><h4>一、需求描述：</h4>
+<p>&emsp;&emsp;在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字段允许不一致。</p>
+<h4>二、设计分析：</h4>
+<p>&emsp;&emsp;功能很简单，如果表字段很少，直接用肉眼比较很快。但如果数据表的字段非常多，用肉眼一个个去比较就太费劲了。另一种不需要写代码的方法就是，把该两条数据都select出来，然后复制整行，通过诸如UltraEdit Compare等工具自动比较两个数据是否全一致，但这种方法有一个工作量就是：不一致的字段是哪些没法提示，并且也没法自动过滤白名单。既然如此，那就写个小工具程序吧。</p>
+<!--more-->
+
+<h4>三、程序架构：</h4>
+<p>&emsp;&emsp;根据以上设计，容易引申出程序需要实现的几大功能：首先需要把两条数据从数据表中select出来；其次，需要逐个检查数据表的每个字段，是否一致；并且，对于不一致的字段，是否是在白名单中，如果不一致且又不在白名单中的话，则需要提示该字段不一致。笔者的主程序正是包含了三个主要函数去实现这三个点：<code>queryRecord()</code>函数用于把记录<code>select</code>出来，<code>compare()</code>函数用于比较两条记录，<code>printResult()</code>函数用于输出结果和提示。那么，先上主程序（以下程序在<code>Java8</code>下测试通过）：</p>
+<p>Compare.java :</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">comparator</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: Compare</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Description: A tool to compare the segment data of mysql database.</span>
+<span class="cm"> * Function description：</span>
+<span class="cm"> *      1. Self-defined primary keys. </span>
+<span class="cm"> *      2. Self-defined filter white list.</span>
+<span class="cm"> *  </span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Email: langlv@qq.com</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Date: Nov 28, 2017 12:58:02 PM</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Version: V1.0</span>
+<span class="cm"> * </span>
+<span class="cm"> */</span>
+
+<span class="kn">import</span> <span class="nn">java.sql.Connection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.PreparedStatement</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.ResultSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Compare</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">CONNECT_URL</span> <span class="o">=</span> <span class="s">&quot;jdbc:mysql://localhost:3306/test?&quot;</span> <span class="o">+</span><span class="s">&quot;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&quot;</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">USER</span> <span class="o">=</span> <span class="s">&quot;root&quot;</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">PWD</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">TABLE_NAME</span> <span class="o">=</span> <span class="s">&quot;victor&quot;</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">PreparedStatement</span> <span class="n">psment</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span>  <span class="n">JDBCUtil</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">JDBCUtil</span><span class="o">.</span><span class="na">MYSQL_DRIVER</span><span class="o">,</span> <span class="n">CONNECT_URL</span><span class="o">,</span> <span class="n">USER</span><span class="o">,</span> <span class="n">PWD</span><span class="o">);</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * All column names of the table which are arranged in real order.</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span><span class="o">[]</span> <span class="n">columnNames</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span>
+            <span class="s">&quot;pri_key&quot;</span><span class="o">,</span>
+            <span class="s">&quot;userName&quot;</span><span class="o">,</span>
+            <span class="s">&quot;phoneNumber&quot;</span><span class="o">,</span>
+            <span class="s">&quot;remark&quot;</span>
+
+        <span class="o">};</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * White list for filtering, please add on demand. </span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span><span class="o">[]</span> <span class="n">filterList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{</span>
+        <span class="s">&quot;pri_key&quot;</span><span class="o">,</span>
+        <span class="s">&quot;remark&quot;</span>
+
+    <span class="o">};</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Query record using self-defined primary keys.</span>
+<span class="cm">     * @param segm1</span>
+<span class="cm">     * @param segm2</span>
+<span class="cm">     * @return  found record resultSet</span>
+<span class="cm">     * @throws SQLException</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">ResultSet</span> <span class="nf">queryRecord</span><span class="o">(</span><span class="n">String</span> <span class="n">segm1</span><span class="o">,</span> <span class="n">String</span> <span class="n">segm2</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span><span class="o">{</span>
+        <span class="n">ResultSet</span> <span class="n">result</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+        <span class="n">String</span> <span class="n">sql</span> <span class="o">=</span> <span class="s">&quot;select * from &quot;</span> <span class="o">+</span> <span class="n">TABLE_NAME</span> <span class="o">+</span> <span class="s">&quot; where userName=? and remark=?&quot;</span><span class="o">;</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Query sql: &quot;</span> <span class="o">+</span> <span class="n">sql</span><span class="o">);</span> 
+        <span class="n">psment</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="n">sql</span><span class="o">);</span>
+        <span class="n">psment</span><span class="o">.</span><span class="na">setString</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">StringUtil</span><span class="o">.</span><span class="na">sqlFilter</span><span class="o">(</span><span class="n">segm1</span><span class="o">));</span>
+        <span class="n">psment</span><span class="o">.</span><span class="na">setString</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">StringUtil</span><span class="o">.</span><span class="na">sqlFilter</span><span class="o">(</span><span class="n">segm2</span><span class="o">));</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">psment</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">();</span>
+        <span class="o">}</span><span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">compare</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">rs1</span><span class="o">,</span> <span class="n">ResultSet</span> <span class="n">rs2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">notEqualList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">if</span><span class="o">(</span><span class="n">rs1</span><span class="o">.</span><span class="na">next</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">rs2</span><span class="o">.</span><span class="na">next</span><span class="o">())</span> <span class="o">{</span>
+                <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">columnNames</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                    <span class="n">String</span> <span class="n">columnName</span> <span class="o">=</span> <span class="n">columnNames</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+
+                    <span class="cm">/*compare specific segments of two results ,</span>
+<span class="cm">                    * and store into list if not equal and not in white list</span>
+<span class="cm">                    */</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">StringUtil</span><span class="o">.</span><span class="na">notEqual</span><span class="o">(</span><span class="n">rs1</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">columnName</span><span class="o">),</span> <span class="n">rs2</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">columnName</span><span class="o">))</span> <span class="o">&amp;&amp;</span> <span class="n">StringUtil</span><span class="o">.</span><span class="na">notIn</span><span class="o">(</span><span class="n">columnName</span><span class="o">,</span><span class="n">filterList</span><span class="o">))</span>
+                        <span class="n">notEqualList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">columnName</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">notEqualList</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">printResult</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">list</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;The different segments: &quot;</span><span class="o">);</span>
+            <span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">str</span> <span class="o">:</span> <span class="n">list</span><span class="o">){</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">count</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> <span class="n">str</span><span class="o">);</span>
+                <span class="n">count</span><span class="o">++;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">else</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;No different segments found outside the white list.&quot;</span><span class="o">);</span>
+        <span class="o">}</span>    
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">comparator</span><span class="o">(</span><span class="n">String</span> <span class="n">segm1</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="n">ResultSet</span> <span class="n">rSet1</span> <span class="o">=</span> <span class="n">queryRecord</span><span class="o">(</span><span class="n">segm1</span><span class="o">,</span> <span class="s">&quot;lvlang1&quot;</span><span class="o">);</span>
+        <span class="n">ResultSet</span> <span class="n">rSet2</span> <span class="o">=</span> <span class="n">queryRecord</span><span class="o">(</span><span class="n">segm1</span><span class="o">,</span> <span class="s">&quot;lvlang2&quot;</span><span class="o">);</span>
+        <span class="k">if</span><span class="o">((</span><span class="n">rSet1</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="n">rSet2</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">))</span>
+            <span class="n">printResult</span><span class="o">(</span><span class="n">compare</span><span class="o">(</span><span class="n">rSet1</span><span class="o">,</span> <span class="n">rSet2</span><span class="o">));</span>
+        <span class="k">else</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Not all the records were queried.&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">JDBCUtil</span><span class="o">.</span><span class="na">closeConnection</span><span class="o">(</span><span class="n">rSet1</span><span class="o">,</span> <span class="n">psment</span><span class="o">,</span> <span class="n">conn</span><span class="o">);</span>
+            <span class="n">JDBCUtil</span><span class="o">.</span><span class="na">closeConnection</span><span class="o">(</span><span class="n">rSet2</span><span class="o">,</span> <span class="n">psment</span><span class="o">,</span> <span class="n">conn</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="n">comparator</span><span class="o">(</span><span class="s">&quot;tony&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;作为示例，本文使用了一个很简单的数据表做示范，只有四个字段：<code>pri_key, userName, phoneNumber, remark</code>，<code>pri_key</code>作为主键允许不一致，<code>remark</code>是我用来专门区分两种造数据方法的，所以也列入白名单，同时因为数据表中存在各种途径造的数据，所以需要用一个字段判别是我们当前要测试的方法造的数据，这个字段就是<code>userName</code>，所以<code>userName</code>这个字段在两条数据中都应该是一致的，作为<code>key</code>之一用于查找数据，其他的字段（这里只剩下<code>phoneNumber</code>）则要作为检查目标，检查是否一致，如果不一致，则需要报错。  </p>
+<p>&emsp;&emsp;数据表搜寻的全字段和白名单，这里都是通过一个<code>String</code>数组来存储，注意全字段数据需要按照数据表的实际字段顺序来排，因为程序比较字段时是通过字段顺序的<code>index</code>来判断当前比较的是哪个名称的字段。白名单数组的使用则只需要将检查出来的不一致的字段去和白名单里面的既定字段比对，是否存在于白名单中，即可。</p>
+<p>&emsp;&emsp;数据表数据如下:  </p>
+<p><img alt="mysql-table" src="http://langlv.me/images/dataCompare-mysql.png"></p>
+<p>&emsp;&emsp;这里顺便推荐下wampserver自带的phpmyadmin mysql数据库管理后台，可以很方便地图形化管理mysql数据库：  </p>
+<p><img alt="wampserver-index" src="http://langlv.me/images/wampserver-index.png"></p>
+<p><img alt="data table" src="http://langlv.me/images/phpmyadmin.png"></p>
+<p>&emsp;&emsp;运行效果如下图：  </p>
+<p><img alt="result" src="http://langlv.me/images/dataCompare-result.png"></p>
+<p>&emsp;&emsp;另外，我将一些可复用的功能抽取出来作为两个工具辅助类：</p>
+<p>JDBCUtil.java :</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">comparator</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.sql.Connection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.DriverManager</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.PreparedStatement</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.ResultSet</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.sql.SQLException</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: JDBCUtil</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Description: A tool to connection database ( mysql or db2 ..) use JDBC. </span>
+<span class="cm"> *</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Email: langlv@qq.com</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Date: Nov 28, 2017 12:58:02 PM</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Version: V1.0</span>
+<span class="cm"> * </span>
+<span class="cm"> */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">JDBCUtil</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">MYSQL_DRIVER</span> <span class="o">=</span> <span class="s">&quot;com.mysql.jdbc.Driver&quot;</span><span class="o">;</span> <span class="c1">//need to import mysql-connector-java-*-bin.jar manually</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kd">static</span> <span class="n">String</span> <span class="n">DB2_DRIVER</span> <span class="o">=</span> <span class="s">&quot;com.ibm.db2.jcc.DB2Driver&quot;</span><span class="o">;</span> <span class="c1">//need to import db2-jdbc-jar manually</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Create the database connection and return it.</span>
+<span class="cm">     * @param DRIVER</span>
+<span class="cm">     * @param URL</span>
+<span class="cm">     * @param USER</span>
+<span class="cm">     * @param PWD</span>
+<span class="cm">     * @return connection object</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">Connection</span> <span class="nf">getConnection</span><span class="o">(</span><span class="n">String</span> <span class="n">driver</span><span class="o">,</span> <span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">String</span> <span class="n">user</span><span class="o">,</span> <span class="n">String</span> <span class="n">pwd</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Connection</span> <span class="n">conn</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="n">driver</span><span class="o">).</span><span class="na">newInstance</span><span class="o">();</span>    
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">DriverManager</span><span class="o">.</span><span class="na">getConnection</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">pwd</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Database connected.&quot;</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">conn</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Close the connection / resulSet / preparedStatement.</span>
+<span class="cm">     * @param rSet</span>
+<span class="cm">     * @param psment</span>
+<span class="cm">     * @param conn</span>
+<span class="cm">     * @throws Exception</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">closeConnection</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">rSet</span><span class="o">,</span> <span class="n">PreparedStatement</span> <span class="n">psment</span><span class="o">,</span> <span class="n">Connection</span> <span class="n">conn</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">rSet</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">rSet</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+                <span class="n">rSet</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">psment</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">psment</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+                <span class="n">psment</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">conn</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">conn</span><span class="o">.</span><span class="na">isClosed</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">conn</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+                <span class="n">conn</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">SQLException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="o">(</span><span class="s">&quot;Fail to close ResultSet / PreParedStatment / Connection !&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>StringUtil.java :</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">comparator</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: StringUtil</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Description: A tool for String dealing</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Email: langlv@qq.com</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Date: Nov 28, 2017 12:58:02 PM</span>
+<span class="cm"> *</span>
+<span class="cm"> * @Version: V1.0</span>
+<span class="cm"> * </span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StringUtil</span> <span class="o">{</span>
+
+
+    <span class="cm">/**</span>
+<span class="cm">     * Judge whether two Strings are equal (trim the space of head and tail)</span>
+<span class="cm">     * @param str1</span>
+<span class="cm">     * @param str2</span>
+<span class="cm">     * @return return true if equal and return false conversely </span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">equal</span><span class="o">(</span><span class="n">String</span> <span class="n">str1</span><span class="o">,</span> <span class="n">String</span> <span class="n">str2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">str1</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;</span> <span class="n">str2</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> 
+            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">str1</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">str2</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> 
+            <span class="o">||</span> <span class="o">(</span><span class="n">str1</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;</span> <span class="n">str2</span> <span class="o">==</span><span class="kc">null</span><span class="o">))</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">str1</span><span class="o">.</span><span class="na">trim</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">str2</span><span class="o">.</span><span class="na">trim</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">notEqual</span><span class="o">(</span><span class="n">String</span> <span class="n">str1</span><span class="o">,</span> <span class="n">String</span> <span class="n">str2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">equal</span><span class="o">(</span><span class="n">str1</span><span class="o">,</span> <span class="n">str2</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Judge whether the string is in the array.</span>
+<span class="cm">     * @param str</span>
+<span class="cm">     * @param array</span>
+<span class="cm">     * @return return true if in and return false conversely</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isIn</span><span class="o">(</span><span class="n">String</span> <span class="n">str</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">array</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">s</span> <span class="o">:</span> <span class="n">array</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">equal</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="n">s</span><span class="o">))</span>
+                <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">notIn</span><span class="o">(</span><span class="n">String</span> <span class="n">str</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">array</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">isIn</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="n">array</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * sql injection filter</span>
+<span class="cm">     * </span>
+<span class="cm">     * Blog of java how to prevent sql injection：</span>
+<span class="cm">     *      http://www.cnblogs.com/EasonJim/p/6223216.html</span>
+<span class="cm">     *      http://blog.csdn.net/jun0052/article/details/8541021</span>
+<span class="cm">     * @param String to filter</span>
+<span class="cm">     * @return filtered String</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">sqlFilter</span><span class="o">(</span><span class="n">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">str</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">str</span><span class="o">.</span><span class="na">replaceAll</span><span class="o">(</span><span class="s">&quot;.*([&#39;;]+|(--)+).*&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;这里的程序我后期额外添加了<code>sql注入</code>过滤器，纯粹是为了学习下，关于<code>java 防止sql注入</code>的方法可以参考一下两个博客：
+<a href="http://www.cnblogs.com/EasonJim/p/6223216.html">java程序防止sql注入的方法</a>
+<a href="http://blog.csdn.net/jun0052/article/details/8541021">Java防止SQL注入（转）</a></p>
+<p>&emsp;&emsp;本文组合使用了<code>通过prepareStatement.setString()拼接字符串</code>和<code>正则表达式替换特殊字符</code>这两种方法。</p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/shu-ju-ku.html">数据库</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                其他
+                </li>
+           
+                <li><a href="https://github.com/Victor-Lv/">GitHub</a></li>
+                <li><a href="http://blog.csdn.net/lv_victor">CSDN博客</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+ 
+</body>
+</html>

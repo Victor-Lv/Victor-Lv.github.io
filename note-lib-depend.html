@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 2017大四实习Python小工具开发笔记</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>2017大四实习Python小工具开发笔记</h1>
+2017-05-27
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><p><strong>This is my python notes of lib dependency checker</strong></p>
+<h4>程序全文(based on python2.7)</h4>
+<!--more-->
+
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python</span>
+<span class="c1"># -*- coding: UTF-8 -*- </span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Lib dependency check of lib and qtgui.</span>
+<span class="sd">@author: Victor Lv</span>
+<span class="sd">@date: 2017-6-1</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">getopt</span>
+
+<span class="n">SCRIPT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">ROOT</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">LEVEL</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1">#an dictionary which express the LEVEL(.so:1, .a:2) of dir</span>
+<span class="n">PATH_OF_LAST_LEVEL</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">LEVEL_OF_SO</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">LEVEL_OF_A</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CURRENT_LEVEL</span> <span class="o">=</span> <span class="n">LEVEL_OF_SO</span> <span class="c1">#1 means .so LEVEL, 2 means .a LEVEL</span>
+<span class="n">ERROR_COUNT</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#count the error of lib dependency</span>
+
+<span class="c1">############## 1: construct level tree  ##############</span>
+<span class="k">def</span> <span class="nf">cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span> <span class="n">index1</span><span class="p">,</span> <span class="n">index2</span><span class="p">):</span>
+    <span class="nb">str</span> <span class="o">=</span> <span class="n">fileText</span><span class="p">[</span><span class="n">index1</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">index2</span><span class="p">]</span> 
+    <span class="n">list1</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">list2</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">list1</span><span class="p">)</span> <span class="c1">#remove \n in list</span>
+    <span class="n">list3</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">list2</span><span class="p">)</span> <span class="c1">#remove empty item in list</span>
+    <span class="k">return</span> <span class="n">list3</span>
+
+<span class="k">def</span> <span class="nf">divide_and_cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="n">stringType</span><span class="p">):</span>
+    <span class="n">index1</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">stringType</span><span class="p">)</span>
+    <span class="n">index2</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="n">index1</span><span class="p">)</span>
+    <span class="n">index3</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">index2</span><span class="p">)</span>
+    <span class="c1">#cut out the string between &#39;()&#39;)</span>
+    <span class="k">return</span> <span class="n">cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span> <span class="n">index2</span><span class="p">,</span> <span class="n">index3</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_new_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="n">stringType</span><span class="p">):</span>
+    <span class="n">newName</span> <span class="o">=</span> <span class="n">divide_and_cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="n">stringType</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">newName</span>
+
+<span class="k">def</span> <span class="nf">find_and_get_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">):</span>
+    <span class="n">newName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;target_link_libraries&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">get_new_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;target_link_libraries&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;TARGET_LINK_LIBRARIES&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">get_new_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;TARGET_LINK_LIBRARIES&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;add_shared_wrapper_lib&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">get_new_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;add_shared_wrapper_lib&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;add_whole_archive_lib&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">get_new_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;add_whole_archive_lib&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">newName</span>
+
+<span class="k">def</span> <span class="nf">tag_and_rename</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">LEVEL</span>
+    <span class="n">path_of_cmake_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">dirName</span><span class="p">,</span><span class="s2">&quot;CMakeLists.txt&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path_of_cmake_file</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_of_cmake_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fileText</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">find_and_get_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">dirName</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">LEVEL</span><span class="p">:</span>
+            <span class="n">LEVEL</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">CURRENT_LEVEL</span>
+            <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">LEVEL</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">CURRENT_LEVEL</span><span class="p">:</span> <span class="c1">#when name conflicts, save the higher LEVEL(.so) name</span>
+            <span class="n">LEVEL</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">CURRENT_LEVEL</span>
+            <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dirName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">LEVEL</span> <span class="ow">and</span> <span class="n">dirName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">:</span>
+            <span class="n">LEVEL</span><span class="p">[</span><span class="n">dirName</span><span class="p">]</span> <span class="o">=</span> <span class="n">CURRENT_LEVEL</span>
+            <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">dirName</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+<span class="c1">#attach label for all dirs in path</span>
+<span class="k">def</span> <span class="nf">tag</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)):</span>
+            <span class="n">tag_and_rename</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">attach_level</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">CURRENT_LEVEL</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="n">dirName</span><span class="p">))</span> <span class="c1">#chdir ./lib ./qtgui</span>
+    <span class="n">tag</span><span class="p">()</span><span class="c1">#.so LEVEL</span>
+    <span class="n">CURRENT_LEVEL</span> <span class="o">=</span> <span class="n">LEVEL_OF_A</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">tag</span><span class="p">()</span> <span class="c1">#.a LEVEL</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;./..&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">ROOT</span><span class="p">)</span>
+
+<span class="c1">###############   2: check dependence   ###################</span>
+<span class="k">def</span> <span class="nf">toDir_is_so_level</span><span class="p">(</span><span class="n">toDir</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">LEVEL</span><span class="p">[</span><span class="n">toDir</span><span class="p">]</span> <span class="o">==</span> <span class="n">LEVEL_OF_SO</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">is_lib_link_to_qtgui</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">):</span>
+    <span class="n">qtgui_start</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="s1">&#39;qtgui&#39;</span><span class="p">)</span>
+    <span class="n">lib_start</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="s1">&#39;lib&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lib_start</span> <span class="ow">in</span> <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">fromDir</span><span class="p">]</span> <span class="ow">and</span> <span class="n">qtgui_start</span> <span class="ow">in</span> <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">toDir</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">is_brother</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fromDir</span> <span class="ow">in</span> <span class="n">PATH_OF_LAST_LEVEL</span> <span class="ow">and</span> <span class="n">toDir</span> <span class="ow">in</span> <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">fromDir</span><span class="p">]</span> <span class="o">==</span> <span class="n">PATH_OF_LAST_LEVEL</span><span class="p">[</span><span class="n">toDir</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<span class="c1">#check the dependence of dir1 -&gt; dir2</span>
+<span class="k">def</span> <span class="nf">dependence_is_true</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">,</span> <span class="n">fromDir_is_unittest</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fromDir_is_unittest</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">toDir_is_so_level</span><span class="p">(</span><span class="n">toDir</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+    <span class="c1">#Dirs in lib cannot link to dirs in qtgui&quot;</span>
+    <span class="k">elif</span> <span class="n">is_lib_link_to_qtgui</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">elif</span> <span class="n">toDir_is_so_level</span><span class="p">(</span><span class="n">toDir</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="c1">#check whether the two nodes are brother-german</span>
+    <span class="k">elif</span> <span class="n">is_brother</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">check_dependence</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">,</span> <span class="n">fromDir_is_unittest</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">toDir</span> <span class="o">!=</span> <span class="s2">&quot;util&quot;</span><span class="p">:</span> <span class="c1">#ignore util</span>
+        <span class="k">if</span> <span class="n">dependence_is_true</span><span class="p">(</span><span class="n">fromDir</span><span class="p">,</span> <span class="n">toDir</span><span class="p">,</span> <span class="n">fromDir_is_unittest</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+<span class="c1">###########     extract out the dependence  ##########</span>
+<span class="k">def</span> <span class="nf">is_key</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">LEVEL</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="c1">#remove libs that aren&#39;t keys of LEVEL dictionary</span>
+<span class="k">def</span> <span class="nf">clip_out_key_libs</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="n">libList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_key</span><span class="p">(</span><span class="n">lib</span><span class="p">):</span>
+            <span class="n">libList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lib</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">libList</span><span class="p">:</span> <span class="c1">#not empty</span>
+            <span class="k">return</span> <span class="n">libList</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="n">stringType</span><span class="p">):</span>
+    <span class="n">LEN_OF_LIB_DEPENDS</span> <span class="o">=</span> <span class="mi">11</span>
+    <span class="k">if</span> <span class="n">stringType</span> <span class="o">==</span> <span class="s2">&quot;target_link_libraries&quot;</span> <span class="ow">or</span> <span class="n">stringType</span> <span class="o">==</span> <span class="s2">&quot;TARGET_LINK_LIBRARIES&quot;</span><span class="p">:</span>
+        <span class="nb">list</span> <span class="o">=</span> <span class="n">divide_and_cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="n">stringType</span><span class="p">)</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">#remove the first name</span>
+        <span class="k">return</span> <span class="n">clip_out_key_libs</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">stringType</span> <span class="o">==</span> <span class="s2">&quot;add_shared_wrapper_lib&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;LIB_DEPENDS&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">index1</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">stringType</span><span class="p">)</span>
+            <span class="c1">#cut out the string between &#39;LIB_DEPENDS&#39; and &#39;WHOLE_ARCHIVE_LIBS&#39;</span>
+            <span class="n">index2</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;LIB_DEPENDS&#39;</span><span class="p">,</span> <span class="n">index1</span><span class="p">)</span>
+            <span class="n">index3</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;WHOLE_ARCHIVE_LIBS&#39;</span><span class="p">,</span> <span class="n">index2</span><span class="p">)</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="n">cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span> <span class="n">index2</span><span class="o">+</span><span class="n">LEN_OF_LIB_DEPENDS</span><span class="p">,</span> <span class="n">index3</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">clip_out_key_libs</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">elif</span> <span class="n">stringType</span> <span class="o">==</span> <span class="s2">&quot;add_whole_archive_lib&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;LIB_DEPENDS&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">index1</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">stringType</span><span class="p">)</span>
+            <span class="c1">#cut out the string between &#39;LIB_DEPENDS&#39; and &#39;)&#39;</span>
+            <span class="n">index2</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;LIB_DEPENDS&#39;</span><span class="p">,</span> <span class="n">index1</span><span class="p">)</span>
+            <span class="n">index3</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="n">index2</span><span class="p">)</span>
+            <span class="nb">list</span> <span class="o">=</span> <span class="n">cut_string</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span> <span class="n">index2</span><span class="o">+</span><span class="n">LEN_OF_LIB_DEPENDS</span><span class="p">,</span> <span class="n">index3</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">clip_out_key_libs</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">find_and_clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">):</span> <span class="c1">#return a list []</span>
+    <span class="k">if</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;target_link_libraries&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;target_link_libraries&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;TARGET_LINK_LIBRARIES&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;TARGET_LINK_LIBRARIES&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;add_shared_wrapper_lib&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;add_shared_wrapper_lib&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;add_whole_archive_lib&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="s2">&quot;add_whole_archive_lib&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="c1">#throw error if there&#39;s STATIC in add_library()</span>
+<span class="k">def</span> <span class="nf">check_static</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span><span class="n">dirName</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fileText</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;add_library&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">index1</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;add_library&quot;</span><span class="p">)</span>
+        <span class="n">index2</span> <span class="o">=</span> <span class="n">fileText</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">,</span><span class="n">index1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fileText</span><span class="p">[</span><span class="n">index1</span><span class="p">:</span><span class="n">index2</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;STATIC&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;Keyword STATIC cannot exist in add_library().&quot;</span>
+            <span class="k">print</span> <span class="s2">&quot;Path is &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">dirName</span><span class="p">)</span>
+            <span class="k">print</span>
+
+<span class="k">def</span> <span class="nf">is_in_whitelist</span><span class="p">(</span><span class="n">fromName</span><span class="p">,</span> <span class="n">toName</span><span class="p">):</span>
+    <span class="n">whitelist_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SCRIPT_PATH</span><span class="p">,</span><span class="s1">&#39;whitelist_of_lib_dependency_check.txt&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">whitelist_path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">whitelist_path</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+                    <span class="nb">list</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)))</span>
+                    <span class="k">if</span> <span class="nb">cmp</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="p">[</span><span class="n">fromName</span><span class="p">,</span> <span class="n">toName</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">True</span>
+                        <span class="k">break</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">def add_whitelist(fromName, toName):</span>
+<span class="sd">    whitelist_path = os.path.join(ROOT,&#39;BCTools&#39;,&#39;LibDependencyChecker&#39;,&#39;whitelist_of_lib_dependency_check.txt&#39;)</span>
+<span class="sd">    if os.path.exists(whitelist_path):</span>
+<span class="sd">        try:</span>
+<span class="sd">            f = open(whitelist_path,&#39;a&#39;)</span>
+<span class="sd">            f.write(fromName + &quot; &quot; +  toName + &#39;\n&#39;)</span>
+<span class="sd">        except:</span>
+<span class="sd">            print &quot;Cannot open the whitelist_of_lib_dependency_check.txt in write mode. Please check the authority of file.&quot;</span>
+<span class="sd">        finally:</span>
+<span class="sd">            f.close()</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="k">def</span> <span class="nf">find_and_check_dependence</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>
+    <span class="n">path_of_cmake_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">dirName</span><span class="p">,</span><span class="s2">&quot;CMakeLists.txt&quot;</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_of_cmake_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fileText</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">find_and_get_name</span><span class="p">(</span><span class="n">fileText</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">check_static</span><span class="p">(</span><span class="n">fileText</span><span class="p">,</span> <span class="n">dirName</span><span class="p">)</span> <span class="c1">#throw error if there&#39;s STATIC in add_library()</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">dirName</span>
+    <span class="k">if</span> <span class="n">dirName</span> <span class="o">==</span> <span class="s2">&quot;unittest&quot;</span><span class="p">:</span>
+        <span class="n">fromDir_is_unittest</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fromDir_is_unittest</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">clipResult</span> <span class="o">=</span> <span class="n">find_and_clip</span><span class="p">(</span><span class="n">fileText</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">clipResult</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">lib</span> <span class="ow">in</span> <span class="n">clipResult</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_in_whitelist</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">lib</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">check_dependence</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="n">fromDir_is_unittest</span><span class="p">)</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                    <span class="k">global</span> <span class="n">ERROR_COUNT</span>
+                    <span class="n">ERROR_COUNT</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">print</span> <span class="s2">&quot;Lib dependency of: &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; -&gt; &quot;</span> <span class="o">+</span> <span class="n">lib</span> <span class="o">+</span> <span class="s2">&quot; is false.&quot;</span>
+                    <span class="k">print</span> <span class="s2">&quot;Path is &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">dirName</span><span class="p">)</span>
+                    <span class="k">print</span>
+
+<span class="k">def</span> <span class="nf">dependence_checker</span><span class="p">(</span><span class="n">dirName</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="n">dirName</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">name1</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">name1</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">name1</span><span class="p">,</span><span class="s2">&quot;CMakeLists.txt&quot;</span><span class="p">)):</span>
+                <span class="n">find_and_check_dependence</span><span class="p">(</span><span class="n">name1</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">name1</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name2</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;./&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">name2</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">name2</span><span class="p">,</span><span class="s2">&quot;CMakeLists.txt&quot;</span><span class="p">)):</span>
+                        <span class="n">find_and_check_dependence</span><span class="p">(</span><span class="n">name2</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="n">name2</span><span class="p">))</span>
+                    <span class="c1">#check unittest dir</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="s1">&#39;unittest&#39;</span><span class="p">,</span><span class="s1">&#39;CMakeLists.txt&#39;</span><span class="p">)):</span>
+                        <span class="n">find_and_check_dependence</span><span class="p">(</span><span class="s2">&quot;unittest&quot;</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;./..&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s2">&quot;./..&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">init_contruct</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">CURRENT_LEVEL</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">ROOT</span><span class="p">)</span>
+    <span class="c1">#construct the level tree</span>
+    <span class="n">attach_level</span><span class="p">(</span><span class="s2">&quot;lib&quot;</span><span class="p">)</span> 
+    <span class="n">CURRENT_LEVEL</span> <span class="o">=</span> <span class="n">LEVEL_OF_SO</span> <span class="c1">#reset current level</span>
+    <span class="n">attach_level</span><span class="p">(</span><span class="s2">&quot;qtgui&quot;</span><span class="p">)</span>
+
+    <span class="c1">#especially /qtgui/plugin is an unreal .so level whose subdirs are .so level</span>
+    <span class="n">CURRENT_LEVEL</span> <span class="o">=</span> <span class="n">LEVEL_OF_SO</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="s1">&#39;qtgui&#39;</span><span class="p">,</span><span class="s1">&#39;plugin&#39;</span><span class="p">))</span>
+    <span class="n">tag</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">check_dependence_error</span><span class="p">():</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">ROOT</span><span class="p">)</span>
+    <span class="n">dependence_checker</span><span class="p">(</span><span class="s2">&quot;lib&quot;</span><span class="p">)</span>
+    <span class="n">dependence_checker</span><span class="p">(</span><span class="s2">&quot;qtgui&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">usage</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Usage: python lib_dependency_check.py [-r] [-c] [-h]</span>
+<span class="s2">where:</span>
+<span class="s2">-r/--root ROOT_PATH: </span>
+<span class="s2">    Provide the parent path where lib and qtgui dirs locate in(absolutely path needed).</span>
+<span class="s2">    The script will search the root automatically if root path wasn&#39;t provided.</span>
+<span class="s2">-c/--changelist changelist_id:</span>
+<span class="s2">    Provide the changlist id to check whether the pending files are in lib/qtgui.</span>
+<span class="s2">    If yes, triggers the lib dependency check.</span>
+<span class="s2">-h/--help: </span>
+<span class="s2">    Prints this message and exits.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">error_throw</span><span class="p">(</span><span class="n">error_message</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">error_message</span>
+    <span class="n">usage</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">root_has_lib_and_qtgui_dirs</span><span class="p">(</span><span class="n">ROOT</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="s1">&#39;lib&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT</span><span class="p">,</span><span class="s1">&#39;qtgui&#39;</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">changelist_affects_lib_dependency</span><span class="p">(</span><span class="n">depotFiles</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">re</span>
+
+    <span class="n">affect_position</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">depotFiles</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;//depot/tachyon/tachyon-RDI-10/(lib|qtgui)/.*CMakeLists.txt&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">affect_position</span>
+
+        <span class="n">affect_position</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1">#connot match r&quot;//depot/tachyon/tachyon-RDI-10/(lib|qtgui)/&quot;</span>
+    <span class="k">return</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">find_lib_and_qtgui_from_dir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">):</span>
+    <span class="n">dir_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;qtgui&#39;</span> <span class="ow">in</span> <span class="n">dir_list</span> <span class="ow">and</span> <span class="s1">&#39;lib&#39;</span> <span class="ow">in</span> <span class="n">dir_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">convert_local_path_into_root</span><span class="p">(</span><span class="n">local_path_of_file</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">local_path_of_file</span><span class="p">))</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">find_lib_and_qtgui_from_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s2">&quot;Cannot found lib&amp;qtgui root.&quot;</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">path</span>
+
+<span class="k">def</span> <span class="nf">find_the_root</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;p4 where &#39;</span> <span class="o">+</span> <span class="n">path</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="n">comm</span><span class="p">)</span> <span class="c1"># run the command to get absolutely local path</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;Cannot get the local path&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">local_path_of_file</span> <span class="o">=</span> <span class="n">ret</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">convert_local_path_into_root</span><span class="p">(</span><span class="n">local_path_of_file</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">check_changelist</span><span class="p">(</span><span class="n">changelist_id</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;p4 -ztag opened -c &#39;</span> <span class="o">+</span> <span class="n">changelist_id</span>
+
+        <span class="kn">import</span> <span class="nn">platform</span>
+
+        <span class="n">linux_comm</span> <span class="o">=</span> <span class="n">comm</span> <span class="o">+</span> <span class="s1">&#39; | grep depotFile&#39;</span>
+        <span class="n">mswindows_comm</span> <span class="o">=</span> <span class="n">comm</span> <span class="o">+</span> <span class="s1">&#39; | findstr depotFile&#39;</span>
+        <span class="n">comm_get_depot_path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
+            <span class="n">comm_get_depot_path</span> <span class="o">=</span> <span class="n">mswindows_comm</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">comm_get_depot_path</span> <span class="o">=</span> <span class="n">linux_comm</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="n">comm_get_depot_path</span><span class="p">)</span> <span class="c1"># run the command to get depotFile path</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Exception: Cannot get the clienFile according to the changelist.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1">#get the depotFile path</span>
+
+    <span class="n">paths</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">paths</span><span class="p">)</span> <span class="c1">#remove \n in list</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">changelist_affects_lib_dependency</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c1">#print &quot;Do not affect lib dependency, checker will not be triggerred.&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The file change triggers lib dependency checker.</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">find_the_root</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="n">ret</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===&gt; lib dependency checking ...</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">global</span> <span class="n">ROOT</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">getopt</span><span class="o">.</span><span class="n">getopt</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="s1">&#39;hc:r:&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">,</span><span class="s1">&#39;changelist=&#39;</span><span class="p">,</span><span class="s1">&#39;root=&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">getopt</span><span class="o">.</span><span class="n">GetoptError</span><span class="p">:</span>
+            <span class="n">error_throw</span><span class="p">(</span><span class="s2">&quot;Error: invalid parameters&quot;</span><span class="p">)</span>
+
+        <span class="n">flag_of_root</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-h&#39;</span><span class="p">,</span> <span class="s1">&#39;--help&#39;</span><span class="p">]:</span>
+                <span class="n">usage</span><span class="p">()</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--changelist&#39;</span><span class="p">]:</span>
+                <span class="n">changelist_id</span> <span class="o">=</span> <span class="n">arg</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">check_changelist</span><span class="p">(</span><span class="n">changelist_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span> 
+                    <span class="c1">#print &quot;\nCannot find the root path for lib dependency checker.\n&quot;</span>
+                    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===&gt; lib dependency done</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="k">return</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ROOT</span> <span class="o">=</span> <span class="n">ret</span>
+                    <span class="n">flag_of_root</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="k">elif</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--root&#39;</span><span class="p">]:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">arg</span>
+                <span class="n">flag_of_root</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">ROOT</span> <span class="o">=</span> <span class="n">path</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">root_has_lib_and_qtgui_dirs</span><span class="p">(</span><span class="n">ROOT</span><span class="p">):</span>
+                    <span class="n">error_throw</span><span class="p">(</span><span class="s2">&quot;Error: this path doesn&#39;t contain lib and qtgui dirs, please check your input.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">ROOT</span><span class="p">):</span>
+                    <span class="n">error_throw</span><span class="p">(</span><span class="s2">&quot;Error: please input the absolute path.&quot;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error_throw</span><span class="p">(</span><span class="s2">&quot;Error: invalid parameters.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag_of_root</span><span class="p">:</span> <span class="c1">#search the root automatically if root path wasn&#39;t provided</span>
+        <span class="n">ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SCRIPT_PATH</span><span class="p">,</span><span class="s1">&#39;../../..&#39;</span><span class="p">,</span><span class="s1">&#39;depot/tachyon/tachyon-RDI-10&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">root_has_lib_and_qtgui_dirs</span><span class="p">(</span><span class="n">ROOT</span><span class="p">):</span>
+            <span class="c1">#print &quot;\nCannot search the real root automatically.\n&quot;</span>
+            <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===&gt; lib dependency check done</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="c1">#do not throw error</span>
+
+    <span class="k">print</span> <span class="s2">&quot;Root path to check is: &quot;</span> <span class="o">+</span> <span class="n">ROOT</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="n">init_contruct</span><span class="p">()</span>
+    <span class="n">check_dependence_error</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s2">&quot;Total lib_dependency error found: &quot;</span><span class="p">,</span><span class="n">ERROR_COUNT</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">===&gt; lib dependency done</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">ERROR_COUNT</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+
+<h4>程序入口</h4>
+<p>阅读程序和程序的执行一样，先从main函数读起，如果程序没声明main函数入口，那么程序会从上往下执行，如果定义了main函数入口，会从main函数进去，<code>if __name__ == '__main__':</code>这句话就声明了程序的入口，一般写成：  </p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<p>这样子即可。  </p>
+<h4>在哪使用sys.exit()</h4>
+<p>但是在本次项目开发中，涉及到一些异常情况需要sys.exit退出系统，而我在main函数里面又不直接使用sys.exit，而是使用return返回函数，所以在这里的声明使用<code>sys.exit(main())</code>，实际上效果和在main函数里面使用sys.exit直接退出是一样的。  </p>
+<!--more-->
+
+<h4>sys.exit()用途</h4>
+<p><code>sys.exit(number)</code>表示退出当前python程序的执行，注意是当前程序，因为经常看到系统不止运行一个程序，通常在一个程序（不管是python还是shell）还会继续开一个子线程去执行另一个程序，这里<code>sys.exit(num)</code>退出的只是当前执行的这个程序（线程），并不会终止整个父线程程序的执行，只是结束了该子程序执行之后返回了，而<em>num</em>值就是返回值，通过这个返回值我们可以判断sys.exit是正常执行完然后退出，还是遭遇异常中断退出。大多数语言（python、shell、C/C++）里面都是使用<em>0</em>来表示正常退出，而非0的返回值表示异常退出，但这只是人为的规定，习惯而已。<code>sys.exit(0)</code>和return 0的区别顾名思义了，<code>return 0</code>仅仅是函数返回，也就是函数不再往下执行剩余代码直接return，而<code>sys.exit(0)</code>则相对暴力，直接是不再执行该程序的所有剩余代码，直接退出程序。如果在程序的某个函数里你对于异常的处理是直接退出程序，那么用<code>sys.exit()</code>就好，但是如果你想把这个异常的处理交给上游函数来处理，那么<code>return num</code>回去，<em>强力甩锅</em>，哈哈，这也是一种风格，因为有时候去查找程序是否在某个地方使用<code>sys.exit()</code>退出挺麻烦的，如果你到处都用了这个方法，有时不知道程序在哪退出的还得去翻代码中的<code>sys.exit()</code>，所以就形成了一种风格是，我只在main函数里面<code>sys.exit()</code>，而其他子函数即便遇到异常，也是通过return不同的值来告诉父函数去让它来处理异常，比如<code>return 0/1/2...</code>或者<code>return "hello"/None</code>，对，就是这个<code>return None</code>，挺方便的，不管返回的是string还是int，我返回一个空<code>None</code>都可以，父函数就可以根据这个返回值来发现子函数执行出现了异常。  </p>
+<h4>global修改全局变量</h4>
+<p>python和shell里面都有全局变量和局部变量的区分，shell对于全局变量的修改是和C/C++一样直接改就行了的，但python特殊，如果你在某个函数（也就是非全局的作用域）里面想要修改全局变量的值，必须先这样声明<code>global var</code>，其中var是你之前声明的全局变量。没有这句话还想修改全局变量会报错。当然，如果你只是想read only全局变量，那么就不需要这句话。</p>
+<h4>if/elif/else</h4>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">condition1</span><span class="p">:</span>
+    <span class="n">do</span> <span class="n">something</span>
+
+<span class="k">elif</span> <span class="n">condition2</span><span class="p">:</span>
+    <span class="n">do</span> <span class="n">something</span>
+
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+
+<p>没啥好说的，需要注意都需要在最后面加上冒号<code>:</code>即可，不要会报错。 </p>
+<h4>try/except/finally</h4>
+<p><code>try</code>里面的语句就是<em>尝试去做</em>，<code>except</code>表示处理try里面抛出来的异常，可以直接<code>except:</code>处理所有异常，也可以只处理单个异常<code>except ValueError:</code>或多个异常<code>except (RuntimeError, TypeError, NameError)</code>,至于在列表里的异常？who care.我不管了，也就是不会进去except直接去执行finally语句去了。  </p>
+<p>在开发中，关于try/except/finally发现过一个奇葩的报错：</p>
+<blockquote>
+<p>finally:
+          ^
+SyntaxError: invalid syntax</p>
+</blockquote>
+<p>明明缩进和语法都没有错误，在本地run也通过，却在别的地方运行时给我来这么一壶，而且对于<code>SyntaxError: invalid syntax</code>这样的报错真是一脸瞢币啊，相比python还是喜欢其他语言有更具体的报错信息给出。还好，有强大的<em>google</em>和<em>stackoverflow</em>，一查问答，发现是因为python版本的问题，python2.5或以上版本才支持try-except-finally直接写在一块，而python2.4或更低的版本只能单独使用try-except或try-finally。</p>
+<blockquote>
+<p>try except finally was only added in 2.5 and before you had to wrap try except in a try finally. </p>
+</blockquote>
+<div class="highlight"><pre><span></span><span class="c1">#/usr/bin/python2.6</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;try&#39;</span>
+
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;except&#39;</span>
+
+<span class="k">finally</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;finally&#39;</span>
+
+
+<span class="c1">#/usr/bin/python2.4</span>
+<span class="k">try</span><span class="p">:</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;try&#39;</span>
+
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;except&#39;</span>
+
+<span class="k">finally</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;finally&#39;</span>
+</pre></div>
+
+
+<p>看来python版本变化这一老大难问题不仅在于python2和python3之间，但就python2.4和python2.5也有地方不兼容，不过这也不怪语言设计者，毕竟他们只是想把语言设计得更好。应该怪python编译版本，在Linux服务器你给我整个python2.4来运行我基于python2.7写的程序？够我吃一壶的，而且服务器这东西不是自己的电脑，我看不顺眼就可以直接升了python2.7就完事了。你必须去修改你的代码去兼容python2.4，而不是让它来兼容你的代码。  </p>
+<p>不过好在最后我也不需要去逐一改代码，那得多大工作量啊，当时想到要全部改掉程序里的try-except-finally我差点崩溃，还好我机智，想到能不能翻一翻看服务器里面有没有更高版本的python。因为我不能直接登录到服务器去跑终端脚本，只能通过在python脚本里面嵌入这样的一句去print出pathon版本：  </p>
+<div class="highlight"><pre><span></span><span class="c1">#Python 2.4-:</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;import sys; print(sys.version)&#39;</span>
+
+
+<span class="c1">#Python 2.5+:</span>
+<span class="n">python</span> <span class="o">--</span><span class="n">version</span> <span class="o">/</span> <span class="n">python</span> <span class="o">-</span><span class="n">V</span>
+</pre></div>
+
+
+<p>不对，这只是我拿来查看print python版本的，实际上我是手动测试各种python版本，也就是这样<code>python2.7 -V</code>，这样<code>python3 -V</code>，这样<code>python2.5 -V</code>，逐个试试，如果没有报错，那个版本就是有的，最后被我发现服务器里面有python2.7版本的，所以搞定，只需要在执行python脚本时，使用<code>python2.7 file.py</code>指定用python2.7而不是默认的<code>python</code>运行程序即可。  </p>
+<h4>多行注释</h4>
+<p>用三个双引号：  </p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">usage</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Usage: python lib_dependency_check.py [-r] [-c] [-h]</span>
+<span class="s2">where:</span>
+<span class="s2">-r/--root ROOT_PATH: </span>
+<span class="s2">    Provide the parent path where lib and qtgui dirs locate in(absolutely path needed).</span>
+<span class="s2">    The script will search the root automatically if root path wasn&#39;t provided.</span>
+<span class="s2">-c/--changelist changelist_id:</span>
+<span class="s2">    Provide the changlist id to check whether the pending files are in lib/qtgui.</span>
+<span class="s2">    If yes, triggers the lib dependency check.</span>
+<span class="s2">-h/--help: </span>
+<span class="s2">    Prints this message and exits.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</pre></div>
+
+
+<h4></h4>
+<p><em>未完待续...</em></p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/python.html">python</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                其他
+                </li>
+           
+                <li><a href="https://github.com/Victor-Lv/">GitHub</a></li>
+                <li><a href="http://blog.csdn.net/lv_victor">CSDN博客</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+ 
+</body>
+</html>

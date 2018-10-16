@@ -2,7 +2,7 @@
 <html lang="chinese (simplified)">
 <head>
     <meta charset="utf-8">
-    <title>Victor Lv's Blog</title>
+    <title>Victor Lv's Blog - 《HTTP权威指南》学习笔记之URI和URL</title>
     <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
     <meta name="author" content="Victor Lv">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,13 +57,10 @@
     <div class="row">
 
         <div class="span9">
-        
-
-        
-
     <div class='article'>
-        <a href="http://langlv.me/demo-springMVC.html"><h2>Just a simple demo: SpringMVC + Mybatis</h2></a>
-        <div class= "well small"> 2018-08-22
+        <div class="content-title">
+            <h1>《HTTP权威指南》学习笔记之URI和URL</h1>
+2017-05-27
 
 by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
  
@@ -71,109 +68,58 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
  Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
 
 
- </div>
-        <div class="summary"><p>Just a simple demo: SpringMVC + Mybatis</p> <a class="btn btn-info xsmall" href="http://langlv.me/demo-springMVC.html">阅读全文</a></div>
-    </div>	
-				
+        </div>
+	
+        <div><p><strong>《HTTP权威指南》学习笔记之URI和URL </strong></p>
+<h5>URI和URL：</h5>
+<blockquote>
+<p>URI：统一资源标识符Uniform Resource Identifier</p>
+<p>URL：统一资源定位符Uniform / Universal Resource Locator   </p>
+</blockquote>
+<p>URL是URI的一个子集,URI表示资源在因特网上的位置，而如何表示这个位置，可以有多种方法，URL就是其中一种，另一种主要的方法是URN，URN直接通过资源的key来确定资源的位置（例如：<code>urn:ietf:rfc:2141</code>）,URN技术尚未成熟和普及，所以目前我们看到的URI都是URL的天下。   </p>
+<p>URL语法由9部分通用格式组成：  </p>
+<div class="highlight"><pre><span></span>&lt;scheme&gt;://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;path&gt;;&lt;params&gt;?&lt;query&gt;#&lt;frag&gt;
+</pre></div>
 
-        
 
-    <div class='article'>
-        <a href="http://langlv.me/tools-recommend.html"><h2>优秀工具软件推荐——密码管理软件keepass</h2></a>
-        <div class= "well small"> 2018-08-14
+<!--more-->
 
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+<p>一般url不会同时出现所有这些组件，URL最重要的是方案scheme、主机host和路径path。  </p>
+<blockquote>
+<p>方案：指定使用协议，无默认值  </p>
+<p>用户：访问资源时需要的用户名，默认值为匿名  </p>
+<p>密码：用户名后面的密码，默认值为<E-mail地址>  </p>
+<p>主机：资源宿主服务器的主机名或者IP地址，无默认值  </p>
+<p>端口：资源宿主服务器正在监听的端口号，很多scheme都有默认的端口号（HTTP默认80端口），默认值是每个scheme特有  </p>
+<p>路径：服务器上资源的本地名，无默认值  </p>
+<p>参数：某些方案会用这个组件来指定输入参数，无默认值  </p>
+<p>查询：某些方案会用这个组件传递参数以激活应用程序（比如数据库、公告板、搜索引擎以及其他因特网网关）。查询组件的内容没有通用格式。无默认值  </p>
+<p>片段：一小片或一部分资源的名字，frag字段不会传送给服务器，而是在客户端内部使用，无默认值  </p>
+</blockquote>
+<p>典型的三种URL如下：  </p>
+<div class="highlight"><pre><span></span>http://207.200.83.29:80/index.html
+
+http://www.google.com:80/index.html
+
+http://www.google.com/index.html
+</pre></div>
+
+
+<p>HTTP发送报文之前，需要与HTTP服务器建立起下层的<strong>TCP连接</strong>，这就类似于给公司办公室某个人打电话，首先，要拨打公司的电话号码，这样才能进去正确的机构，其次，拨打联系人的<strong>分机号</strong>。在TCP中，IP地址就是公司号码，端口号就是联系人分机号，端口号往往跟操作系统上运行的特定软件相关。  </p>
+<p>在上面的第一个url例子中，最前面的http是<strong>方案scheme</strong>，表明使用http协议，其他scheme有诸如ftp等。后面的207.200.83.29就是<strong>IP地址</strong>，80是<strong>端口</strong>，IP地址加端口就能让你联系上你需要联系的那个人，然后/index.html这些在ip地址后面的都是<strong>资源的相对位置</strong>，告诉联系人你把你这边放在index.html的资源给我，在web开发中，这些相对位置通常指的是文件夹结构，比如<code>/home/user/index.html</code>。  </p>
+<p>然后第二个url例子则换了种方式，通过域名这样更符合用户体验的来代替IP地址，实际上也是先通过DNS域名服务器先把<strong>域名转换成IP地址</strong>再向服务器发送http请求的。  </p>
+<p>然后第三个例子省略了端口号，HTTP的URL中没有指定端口号时，会给出默认的<strong>端口号假设</strong>，比如假设默认是是80。  </p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
  
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>优秀工具软件推荐——密码管理软件keepass</p> <a class="btn btn-info xsmall" href="http://langlv.me/tools-recommend.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Hibernate-mybatis-use.html"><h2>Hibernate 与 Mybatis 入门使用</h2></a>
-        <div class= "well small"> 2018-07-12
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>Hibernate 与 Mybatis 入门使用</p> <a class="btn btn-info xsmall" href="http://langlv.me/Hibernate-mybatis-use.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/zibeiyuchaoyue.html"><h2>生命意义与自我主义——读《自卑与超越》有感</h2></a>
-        <div class= "well small"> 2018-01-20
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a> 
-
-
- </div>
-        <div class="summary"><p>今天阅读《自卑与超越》一书，颇有收获，尤其是第 1.3 章节的内容，正与自己近期的一些思考相关，尤其在本节末段关于爱与婚姻的一段阐述，直戳我心，猛醒自己这一年时间正是处于这种“自我主义”的心态，由此导致了一些不好的后果，给身边的一些人带来了非常不好的记忆，对此，我怀有愧疚。</p> <a class="btn btn-info xsmall" href="http://langlv.me/zibeiyuchaoyue.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Java-polymorphism.html"><h2>站在巨人的肩膀上编程----1：深入浅出谈多态</h2></a>
-        <div class= "well small"> 2017-12-06
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>本文结合示例程序分析面向编程语言的多态特性的几大作用，正因为有这几大作用，能够解决程序员在编程中遇到的一系列烦恼，所以多态才会被设计出来并被广泛应用。</p> <a class="btn btn-info xsmall" href="http://langlv.me/Java-polymorphism.html">阅读全文</a></div>
-    </div>	
-				
-
-        
-
-    <div class='article'>
-        <a href="http://langlv.me/Tesseract.html"><h2>使用 Tesseract 进行文字识别</h2></a>
-        <div class= "well small"> 2017-12-01
-
-by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
- 
-
- Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
-
-
- </div>
-        <div class="summary"><p>使用 Tesseract 进行文字识别</p> <a class="btn btn-info xsmall" href="http://langlv.me/Tesseract.html">阅读全文</a></div>
-    </div>	
-				
-<div class="pagination">
-<ul>
-    <li class="prev disabled"><a href="#">&larr; 上一页</a></li>
-
-    <li class="active"><a href="http://langlv.me/index.html">1</a></li>
-    <li class=""><a href="http://langlv.me/index2.html">2</a></li>
-    <li class=""><a href="http://langlv.me/index3.html">3</a></li>
-    <li class=""><a href="http://langlv.me/index4.html">4</a></li>
-
-    <li class="next"><a href="http://langlv.me/index2.html">下一页 &rarr;</a></li>
-
-</ul>
-</div>
-  
+		标签 <a href="http://langlv.me/tag/network.html">network</a> 	
+    </div>
         </div>
         
 

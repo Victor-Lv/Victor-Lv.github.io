@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - Just a simple demo: SpringMVC + Mybatis</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>Just a simple demo: SpringMVC + Mybatis</h1>
+2018-08-22
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><h3>Just a simple demo: SpringMVC + Mybatis</h3>
+<h4>1. web.xml</h4>
+<p>First configure <code>web.xml</code>  which is used for Spring and SpringMVC:
+<em>web.xml</em></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;web-app</span> <span class="na">version=</span><span class="s">&quot;2.5&quot;</span>
+         <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
+         <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee</span>
+<span class="s">    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;servlet&gt;</span>
+        <span class="c">&lt;!-- This servlet-name links to the configuration file: app-servlet.xml --&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>app<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;servlet-class&gt;</span>
+            org.springframework.web.servlet.DispatcherServlet
+        <span class="nt">&lt;/servlet-class&gt;</span>
+        <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
+    <span class="nt">&lt;/servlet&gt;</span>
+
+    <span class="nt">&lt;servlet-mapping&gt;</span>
+        <span class="nt">&lt;servlet-name&gt;</span>app<span class="nt">&lt;/servlet-name&gt;</span>
+        <span class="nt">&lt;url-pattern&gt;</span>/<span class="nt">&lt;/url-pattern&gt;</span>
+    <span class="nt">&lt;/servlet-mapping&gt;</span>
+
+<span class="nt">&lt;/web-app&gt;</span>
+</pre></div>
+
+
+<!--more-->
+
+<p>Here,  <code>web.xml</code> configure the important element <strong>DispatcherServlet</strong> and map it into <em>/</em> url ( website root url ). If external context configuration is needed, we can specify external configuration in this way:</p>
+<div class="highlight"><pre><span></span><span class="c">&lt;!-- Specify the external context configuration file --&gt;</span>
+    <span class="nt">&lt;context-param&gt;</span>
+        <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
+        <span class="nt">&lt;param-value&gt;</span>classpath:spring/root-context.xml<span class="nt">&lt;/param-value&gt;</span>
+    <span class="nt">&lt;/context-param&gt;</span>
+
+    <span class="c">&lt;!-- Setup Spring&#39;s context listener which will load the context configured in `contextConfigLocation` --&gt;</span>
+    <span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="nt">&lt;/listener-class&gt;</span>
+    <span class="nt">&lt;/listener&gt;</span>
+</pre></div>
+
+
+<h4>2. servlet.xml</h4>
+<p>In <code>web.xml</code>, we specify a servlet who's name is <code>app</code>. This will tell the program to search a xml configuration who's name is <code>app-servlet.xml</code>. So, we need to create <code>app-servlet.xml</code>:
+<em>app-servlet.xml</em></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
+       <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+       <span class="na">xmlns:context=</span><span class="s">&quot;http://www.springframework.org/schema/context&quot;</span>
+       <span class="na">xmlns:mvc=</span><span class="s">&quot;http://www.springframework.org/schema/mvc&quot;</span>
+       <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://www.springframework.org/schema/beans</span>
+<span class="s">    http://www.springframework.org/schema/beans/spring-beans.xsd</span>
+<span class="s">    http://www.springframework.org/schema/context</span>
+<span class="s">    http://www.springframework.org/schema/context/spring-context.xsd</span>
+<span class="s">    http://www.springframework.org/schema/mvc</span>
+<span class="s">    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd&quot;</span><span class="nt">&gt;</span>
+
+    <span class="c">&lt;!-- Enable Spring-MVC, driven by annotation --&gt;</span>
+    <span class="nt">&lt;mvc:annotation-driven</span> <span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;context:component-scan</span> <span class="na">base-package=</span><span class="s">&quot;test.control&quot;</span> <span class="nt">/&gt;</span>
+
+    <span class="c">&lt;!-- Configure JSP ViewResolver --&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">class=</span><span class="s">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;viewClass&quot;</span> <span class="na">value=</span><span class="s">&quot;org.springframework.web.servlet.view.JstlView&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;prefix&quot;</span> <span class="na">value=</span><span class="s">&quot;/WEB-INF/views/&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;suffix&quot;</span> <span class="na">value=</span><span class="s">&quot;.jsp&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+
+<span class="nt">&lt;/beans&gt;</span>
+</pre></div>
+
+
+<p>In this file, we enable the Spring-MVC driven by annotion. And we tell the program to search the component bean in package <code>test.control</code> and then load the beans into context. Also, we inject a ViewResolver bean used to render JSP views.</p>
+<h3>3. Controller and View</h3>
+<p>Ok, configure is finished. Let's begin write MVC (model - view - control) code. First, we complete the controllers. All websites need an index page, generally be index view. IndexController is showed as follow:
+<em>IndexController.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">test.control</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+<span class="kn">import static</span> <span class="nn">org.springframework.web.bind.annotation.RequestMethod.*</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: IndexController</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/8/17 16:36</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="nd">@Controller</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">IndexController</span> <span class="o">{</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">GET</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">index</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Index controller&quot;</span><span class="o">);</span>
+        <span class="k">return</span> <span class="s">&quot;index&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>IndexController is very simple. It just map the root path <code>/</code> into the <code>index</code> method, and then return the view name <code>index</code>. In <code>app-context.xml</code>, we specify the view's preffix as <code>/WEB-INF/views/</code>, suffix as <code>.jsp</code>. So <em>DispatcherServlet</em> will help us to convert the returned string ( <code>index</code> ) into view's real path: <code>/WEB-INF/views/index.jsp</code>, and invoke the ViewResolver to render it into html page which is the real page we see in web browser.  Then, let's create a simple JSP view:
+<em>index.jsp</em></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;%-</span><span class="o">-</span>
+  <span class="no">Created</span> <span class="n">by</span> <span class="no">IntelliJ</span> <span class="no">IDEA</span><span class="o">.</span>
+  <span class="ss">User</span><span class="p">:</span> <span class="n">lvlang</span>
+  <span class="ss">Date</span><span class="p">:</span> <span class="mi">2018</span><span class="o">/</span><span class="mi">8</span><span class="o">/</span><span class="mi">20</span>
+  <span class="ss">Time</span><span class="p">:</span> <span class="mi">11</span><span class="p">:</span><span class="mi">24</span>
+  <span class="no">To</span> <span class="n">change</span> <span class="n">this</span> <span class="n">template</span> <span class="n">use</span> <span class="no">File</span> <span class="o">|</span> <span class="no">Settings</span> <span class="o">|</span> <span class="no">File</span> <span class="no">Templates</span><span class="o">.</span>
+<span class="o">-</span><span class="cp">-%&gt;</span>
+<span class="cp">&lt;%</span><span class="err">@</span> <span class="n">taglib</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;c&quot;</span> <span class="n">uri</span><span class="o">=</span><span class="s2">&quot;http://java.sun.com/jsp/jstl/core&quot;</span> <span class="cp">%&gt;</span>
+<span class="cp">&lt;%</span><span class="err">@</span> <span class="n">page</span> <span class="n">contentType</span><span class="o">=</span><span class="s2">&quot;text/html;charset=UTF-8&quot;</span> <span class="n">language</span><span class="o">=</span><span class="s2">&quot;java&quot;</span> <span class="cp">%&gt;</span>
+<span class="cp">&lt;%</span><span class="err">@</span> <span class="n">page</span> <span class="n">session</span><span class="o">=</span><span class="s2">&quot;false&quot;</span> <span class="cp">%&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Just a simple demo: SpringMVC + Mybatis<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;h1&gt;</span>Just a simple demo: SpringMVC + Mybatis<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/selectAllUser&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+        <span class="nt">&lt;span&gt;</span>Search all user:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;selectAllUser&quot;</span> <span class="na">value=</span><span class="s">&quot;search&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/selectUserID&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+        <span class="nt">&lt;span&gt;</span>Search user by user ID, please enter user ID:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;userID&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;search&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/insertUser&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+        <span class="nt">&lt;span&gt;</span>Insert user, please enter user name:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;insertUserName&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;span&gt;</span>user address:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;insertUserAddress&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;insert&quot;</span> <span class="na">value=</span><span class="s">&quot;insert&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/updateUser&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+        <span class="nt">&lt;span&gt;</span>Update user, please enter user ID:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;updateUserID&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;span&gt;</span>user name:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;updateUserName&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;span&gt;</span>user address:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;updateUserAddress&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;updateUser&quot;</span> <span class="na">value=</span><span class="s">&quot;update&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;/deleteUser&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+        <span class="nt">&lt;span&gt;</span>Delete user by ID, please enter user ID:<span class="nt">&lt;/span&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;deleteUserID&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;deleteUser&quot;</span> <span class="na">value=</span><span class="s">&quot;delete&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+
+<p>In this simple page, we install the user CRUD action. Every action redirect an website relative path. So, let's create the UserController to process the user CRUD request.
+<em>UserController.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">test.control</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.servlet.ModelAndView</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">test.entity.User</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">test.dao.UserTool</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.servlet.http.HttpServletRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="kn">import static</span> <span class="nn">org.springframework.web.bind.annotation.RequestMethod.*</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: UserController</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/8/20 11:06</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="nd">@Controller</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/selectAllUser&quot;</span> <span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">ModelAndView</span> <span class="nf">selectAllUser</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Selecting All User.&quot;</span><span class="o">);</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">user</span> <span class="o">=</span> <span class="n">UserTool</span><span class="o">.</span><span class="na">selectAllUser</span><span class="o">();</span>
+        <span class="n">ModelAndView</span> <span class="n">modelAndView</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelAndView</span><span class="o">(</span><span class="s">&quot;/user_list&quot;</span><span class="o">);</span>
+        <span class="n">modelAndView</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">modelAndView</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/selectUserID&quot;</span> <span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">ModelAndView</span> <span class="nf">selectUserID</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">httpServletRequest</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">userID</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;userID&quot;</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Selecting myUser who&#39;s ID is: &quot;</span> <span class="o">+</span> <span class="n">userID</span><span class="o">);</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;();</span>
+        <span class="n">User</span> <span class="n">user1</span> <span class="o">=</span> <span class="n">UserTool</span><span class="o">.</span><span class="na">selectUser</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">userID</span><span class="o">));</span>
+        <span class="c1">//Avoid adding &quot;null&quot; into List which will cause exception</span>
+        <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">user1</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">user</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">user1</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">ModelAndView</span> <span class="n">modelAndView</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ModelAndView</span><span class="o">(</span><span class="s">&quot;/user_list&quot;</span><span class="o">);</span>
+        <span class="n">modelAndView</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="s">&quot;user&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">modelAndView</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/insertUser&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">insertUser</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">httpServletRequest</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">newUserName</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;insertUserName&quot;</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">newUserAddress</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;insertUserAddress&quot;</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Inserting user, name: &quot;</span> <span class="o">+</span> <span class="n">newUserName</span> <span class="o">+</span> <span class="s">&quot;, address:&quot;</span> <span class="o">+</span> <span class="n">newUserAddress</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">insertSuccess</span> <span class="o">=</span> <span class="n">UserTool</span><span class="o">.</span><span class="na">insertUser</span><span class="o">(</span><span class="n">newUserName</span><span class="o">,</span> <span class="n">newUserAddress</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">insertSuccess</span><span class="o">){</span>
+            <span class="k">return</span> <span class="s">&quot;success&quot;</span><span class="o">;</span>
+        <span class="o">}</span><span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="s">&quot;fail&quot;</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/updateUser&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">updateUser</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">httpServletRequest</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">updateUserID</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;updateUserID&quot;</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">updateUserName</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;updateUserName&quot;</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">updateUserAddress</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;updateUserAddress&quot;</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Updating user, ID:&quot;</span> <span class="o">+</span> <span class="n">updateUserID</span> <span class="o">+</span> <span class="s">&quot;, name:&quot;</span> <span class="o">+</span> <span class="n">updateUserName</span> <span class="o">+</span> <span class="s">&quot;, address:&quot;</span> <span class="o">+</span> <span class="n">updateUserAddress</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">updateSuccess</span> <span class="o">=</span> <span class="n">UserTool</span><span class="o">.</span><span class="na">updateUser</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">updateUserID</span><span class="o">),</span> <span class="n">updateUserName</span><span class="o">,</span> <span class="n">updateUserAddress</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">updateSuccess</span><span class="o">){</span>
+            <span class="k">return</span> <span class="s">&quot;success&quot;</span><span class="o">;</span>
+        <span class="o">}</span><span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="s">&quot;fail&quot;</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;/deleteUser&quot;</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">POST</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">deleteUser</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">httpServletRequest</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">deleteUserID</span> <span class="o">=</span> <span class="n">httpServletRequest</span><span class="o">.</span><span class="na">getParameter</span><span class="o">(</span><span class="s">&quot;deleteUserID&quot;</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Deleting user, ID: &quot;</span> <span class="o">+</span> <span class="n">deleteUserID</span><span class="o">);</span>
+        <span class="kt">boolean</span> <span class="n">deleteSuccess</span> <span class="o">=</span> <span class="n">UserTool</span><span class="o">.</span><span class="na">deleteUser</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">deleteUserID</span><span class="o">));</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">deleteSuccess</span><span class="o">){</span>
+            <span class="k">return</span> <span class="s">&quot;success&quot;</span><span class="o">;</span>
+        <span class="o">}</span><span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="s">&quot;fail&quot;</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>To finish the user CRUD's action, we need DAO ( Data Access Object ) to connect the database. Here, we use the ORM framework <em>Mybatis</em> as the tool. By the way, we can use something else database access  framework. That is, in MVC framework, each layer is separate so that we can choose the framework we like such as choosing Hibernate or Mybatis in Model layer and JSP or html in view layer. Every framework is just an plug-in component or to say: <em>Service</em>. We can choose and change <em>Service</em> as we like. Sounds greate ?</p>
+<h4>Model layer &amp; Mybatis</h4>
+<p>First, we need the Mybatis's configuration. Here, <code>mybatis-config.xml</code> configures the dataSource infomation and specify the Mapper.xml file path.
+<em>mybatis-config.xml</em></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE configuration</span>
+<span class="cp">        PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span>
+<span class="cp">        &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+
+    <span class="c">&lt;!-- including external configuration file --&gt;</span>
+    <span class="nt">&lt;properties</span> <span class="na">resource=</span><span class="s">&quot;mybatis/jdbc.properties&quot;</span><span class="nt">&gt;&lt;/properties&gt;</span>
+
+    <span class="c">&lt;!-- Set type alias used for Mapper.xml --&gt;</span>
+    <span class="nt">&lt;typeAliases&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">&quot;User&quot;</span> <span class="na">type=</span><span class="s">&quot;test.entity.User&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/typeAliases&gt;</span>
+
+    <span class="nt">&lt;environments</span> <span class="na">default=</span><span class="s">&quot;development&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;environment</span> <span class="na">id=</span><span class="s">&quot;development&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;transactionManager</span> <span class="na">type=</span><span class="s">&quot;JDBC&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;dataSource</span> <span class="na">type=</span><span class="s">&quot;POOLED&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;driver&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.driverClass}&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;url&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.url}&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.userName}&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span> <span class="na">value=</span><span class="s">&quot;${JDBC.userPassword}&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/dataSource&gt;</span>
+        <span class="nt">&lt;/environment&gt;</span>
+    <span class="nt">&lt;/environments&gt;</span>
+
+    <span class="nt">&lt;mappers&gt;</span>
+        <span class="nt">&lt;mapper</span> <span class="na">resource=</span><span class="s">&quot;mybatis/UserMapper.xml&quot;</span><span class="nt">&gt;&lt;/mapper&gt;</span>
+    <span class="nt">&lt;/mappers&gt;</span>
+
+<span class="nt">&lt;/configuration&gt;</span>
+</pre></div>
+
+
+<p>For the convenience of modification, we put the database connection information into the external file <code>jdbc.properties</code>:
+<em>jdbc.properties</em></p>
+<div class="highlight"><pre><span></span><span class="na">JDBC.driverClass</span><span class="o">=</span><span class="s">com.mysql.jdbc.Driver</span>
+<span class="na">JDBC.url</span><span class="o">=</span><span class="s">jdbc:mysql://localhost:3306/lvlang?autoReconnect=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=UTF-8</span>
+<span class="na">JDBC.userName</span><span class="o">=</span><span class="s">root</span>
+<span class="na">JDBC.userPassword</span><span class="o">=</span><span class="s">123456</span>
+</pre></div>
+
+
+<p>Then, we configure our SQL statement in <code>UserMapper.xml</code>:
+<em>UserMapper.xml</em></p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE mapper</span>
+<span class="cp">        PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span>
+<span class="cp">        &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;</span>
+
+<span class="nt">&lt;mapper</span> <span class="na">namespace=</span><span class="s">&quot;UserMapper&quot;</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;sql</span> <span class="na">id=</span><span class="s">&quot;userList&quot;</span><span class="nt">&gt;</span>id, name, address<span class="nt">&lt;/sql&gt;</span>
+
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;queryAll&quot;</span> <span class="na">resultType=</span><span class="s">&quot;User&quot;</span><span class="nt">&gt;</span>
+        SELECT 
+        <span class="nt">&lt;include</span> <span class="na">refid=</span><span class="s">&quot;userList&quot;</span> <span class="nt">/&gt;</span>
+        FROM User
+        ORDER BY id ASC
+    <span class="nt">&lt;/select&gt;</span>
+
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;selectUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;int&quot;</span> <span class="na">resultType=</span><span class="s">&quot;User&quot;</span><span class="nt">&gt;</span>
+        SELECT
+        <span class="nt">&lt;include</span> <span class="na">refid=</span><span class="s">&quot;userList&quot;</span> <span class="nt">/&gt;</span>
+        FROM User
+        WHERE id = #{id}
+    <span class="nt">&lt;/select&gt;</span>
+
+    <span class="nt">&lt;insert</span> <span class="na">id=</span><span class="s">&quot;insertUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;User&quot;</span> <span class="na">useGeneratedKeys=</span><span class="s">&quot;true&quot;</span> <span class="na">keyProperty=</span><span class="s">&quot;id&quot;</span><span class="nt">&gt;</span>
+        insert into User (name, address)
+                VALUES (#{name}, #{address})
+    <span class="nt">&lt;/insert&gt;</span>
+
+    <span class="nt">&lt;delete</span> <span class="na">id=</span><span class="s">&quot;deleteUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;int&quot;</span> <span class="nt">&gt;</span>
+        DELETE FROM User WHERE id = #{id}
+    <span class="nt">&lt;/delete&gt;</span>
+
+    <span class="nt">&lt;update</span> <span class="na">id=</span><span class="s">&quot;updateUser&quot;</span> <span class="na">parameterType=</span><span class="s">&quot;User&quot;</span><span class="nt">&gt;</span>
+        UPDATE User set
+            name = #{name},
+            address = #{address}
+        where id = #{id}
+    <span class="nt">&lt;/update&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</pre></div>
+
+
+<p>Ok, Mybatis's configuration and SQL mapper is ready. In Mybatis, <strong>SqlSession</strong> is used to execute database access. Here, we create an simple SqlSession pool to provide SqlSession:
+<em>SessionFactory.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">test.dao</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.io.Resources</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSessionFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSessionFactoryBuilder</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.InputStream</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: SessionFactory.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SessionFactory</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">SqlSessionFactory</span> <span class="n">sqlSessionFactory</span><span class="o">;</span>
+
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="c1">// introduce the datasource configuration file</span>
+        <span class="n">String</span> <span class="n">resource</span> <span class="o">=</span> <span class="s">&quot;mybatis/mybatis-config.xml&quot;</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">InputStream</span> <span class="n">inputStream</span> <span class="o">=</span> <span class="n">Resources</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="n">resource</span><span class="o">);</span>
+            <span class="n">sqlSessionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SqlSessionFactoryBuilder</span><span class="o">().</span><span class="na">build</span><span class="o">(</span><span class="n">inputStream</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">SqlSession</span> <span class="nf">getSession</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">sqlSessionFactory</span><span class="o">.</span><span class="na">openSession</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Then, let's use the SqlSession to access database and excute the User table's CURD:
+<em>UserTool.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">test.dao</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.ibatis.session.SqlSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">test.entity.User</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: UserTool.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserTool</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span> <span class="n">arg</span><span class="o">[])</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+        <span class="n">User</span> <span class="n">user1</span> <span class="o">=</span> <span class="n">selectUser</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user1</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Insert user: &quot;</span> <span class="o">+</span> <span class="n">insertUser</span><span class="o">(</span><span class="s">&quot;Victor&quot;</span><span class="o">,</span> <span class="s">&quot;New York&quot;</span><span class="o">));</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Update user: &quot;</span> <span class="o">+</span> <span class="n">updateUser</span><span class="o">(</span><span class="mi">7</span><span class="o">,</span> <span class="s">&quot;Bill Gates&quot;</span><span class="o">,</span> <span class="s">&quot;Beijing&quot;</span><span class="o">));</span>
+        <span class="n">User</span> <span class="n">user2</span> <span class="o">=</span> <span class="n">selectUser</span><span class="o">(</span><span class="mi">7</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user2</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Delete User: &quot;</span> <span class="o">+</span> <span class="n">deleteUser</span><span class="o">(</span><span class="mi">12</span><span class="o">));</span>
+
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="nf">selectAllUser</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Selecting all users...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">userList</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">selectList</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="s">&quot;UserMapper.queryAll&quot;</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">userList</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">userList</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Not found!&quot;</span><span class="o">);</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">User</span> <span class="nf">selectUser</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Selecting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="o">(</span><span class="n">User</span><span class="o">)</span> <span class="n">session</span><span class="o">.</span><span class="na">selectOne</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="s">&quot;UserMapper.selectUser&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="kc">null</span> <span class="o">!=</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+                <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Not found!&quot;</span><span class="o">);</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">insertUser</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Inserting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">();</span>
+            <span class="n">user1</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+            <span class="n">user1</span><span class="o">.</span><span class="na">setAddress</span><span class="o">(</span><span class="n">address</span><span class="o">);</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="s">&quot;UserMapper.insertUser&quot;</span><span class="o">,</span> <span class="n">user1</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">updateUser</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Updating user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">address</span><span class="o">);</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="s">&quot;UserMapper.updateUser&quot;</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">deleteUser</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">SqlSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">SessionFactory</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Deleting user...&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="s">&quot;UserMapper.deleteUser&quot;</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+            <span class="kt">boolean</span> <span class="n">result</span> <span class="o">=</span> <span class="o">(</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="kc">true</span> <span class="o">:</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Also, the <code>User</code> entiry is needed which mapping the User table in database:
+<em>User.java</em></p>
+<div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * @ClassName: User.java</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: http://langlv.me</span>
+<span class="cm"> * @Date: 2018/7/10 15:44</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kn">package</span> <span class="nn">test.entity</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">User</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">address</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">User</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the id</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param id the id to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the name</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param name the name to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setName</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @return the address</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getAddress</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * @param address the address to set</span>
+<span class="cm">     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setAddress</span><span class="o">(</span><span class="n">String</span> <span class="n">address</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">address</span> <span class="o">=</span> <span class="n">address</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;User [id=&quot;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span> <span class="s">&quot;, name=&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span><span class="s">&quot;, address= &quot;</span> <span class="o">+</span> <span class="n">address</span> <span class="o">+</span> <span class="s">&quot; ]&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Ok, database access tool is finished. Now we clear the way between <em>controller</em> and <em>model</em>. 
+Here is the work flow of Spring-MVC's DispatcherServlet :
+<img alt=" DispatcherServlet's work flow " src="http://langlv.me/images/dispatcherServlet.png"></p>
+<p><strong>The DispatcherServlet gets http request from browser and then dispatchs the request to specific controller according to the request url path. The controller will invoke the model layer to execute database operation and return the view page alias string and result data to DispatcherServlet. Then DispatcherServlet / ViewResolver will combine the model data with JSP view to create the real html page and return it to browser.</strong></p>
+<p>Ok, all is done. Let's review the project structure:
+<img alt="project structrure" src="http://langlv.me/images/mvc_demo.png"></p>
+<h4>A little bit ugly pages</h4>
+<p>Index page:</p>
+<p><img alt="index page" src="http://langlv.me/images/demo_res1.png"></p>
+<p>Select all user:</p>
+<p><img alt="selectAllUser" src="http://langlv.me/images/demo_res2.png"></p>
+<p>Insert a user and then redirect to success page:</p>
+<p><img alt="insertUser" src="http://langlv.me/images/demo_res3.png"></p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/spring.html">spring</a> <a href="http://langlv.me/tag/mybatis.html">mybatis</a> <a href="http://langlv.me/tag/springmvc.html">springMVC</a> <a href="http://langlv.me/tag/java-web.html">Java-Web</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+            <div class="social">
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                其他
+                </li>
+           
+                <li><a href="https://github.com/Victor-Lv/">GitHub</a></li>
+                <li><a href="http://blog.csdn.net/lv_victor">CSDN博客</a></li>
+            </ul>
+            </div>
+            </div>
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+ 
+</body>
+</html>
