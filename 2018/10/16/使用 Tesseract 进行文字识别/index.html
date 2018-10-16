@@ -80,9 +80,9 @@
 
 
 <meta name="description" content="Title: 使用 Tesseract 进行文字识别Date: 2017-12-1 17:49Category: 技术博客Modified: 2017-12-1 17:49Tags: 文字识别Slug: TesseractAuthors: Victor LvSummary: 使用 Tesseract 进行文字识别   1. 安装 Tesseract、字库、jTessBoxEditor&amp;emsp;&amp;">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Victor Lv&#39;s blog">
-<meta property="og:url" content="http://langlv.me/blog/使用 Tesseract 进行文字识别.html">
+<meta property="og:url" content="http://langlv.me/2018/10/16/使用 Tesseract 进行文字识别/index.html">
 <meta property="og:site_name" content="Victor Lv&#39;s blog">
 <meta property="og:description" content="Title: 使用 Tesseract 进行文字识别Date: 2017-12-1 17:49Category: 技术博客Modified: 2017-12-1 17:49Tags: 文字识别Slug: TesseractAuthors: Victor LvSummary: 使用 Tesseract 进行文字识别   1. 安装 Tesseract、字库、jTessBoxEditor&amp;emsp;&amp;">
 <meta property="og:image" content="http://langlv.me/images/tesseract_cmd2.png">
@@ -128,7 +128,7 @@
 
 
 
-  <link rel="canonical" href="http://langlv.me/blog/使用 Tesseract 进行文字识别.html"/>
+  <link rel="canonical" href="http://langlv.me/2018/10/16/使用 Tesseract 进行文字识别/"/>
 
 
 
@@ -229,24 +229,86 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://langlv.me/2018/10/16/使用 Tesseract 进行文字识别/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吕浪">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor Lv's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>Title: 使用 Tesseract 进行文字识别<br>Date: 2017-12-1 17:49<br>Category: 技术博客<br>Modified: 2017-12-1 17:49<br>Tags: 文字识别<br>Slug: Tesseract<br>Authors: Victor Lv<br>Summary: 使用 Tesseract 进行文字识别  </p>
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-16T15:02:33+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Title: 使用 Tesseract 进行文字识别<br>Date: 2017-12-1 17:49<br>Category: 技术博客<br>Modified: 2017-12-1 17:49<br>Tags: 文字识别<br>Slug: Tesseract<br>Authors: Victor Lv<br>Summary: 使用 Tesseract 进行文字识别  </p>
 <h3 id="1-安装-Tesseract、字库、jTessBoxEditor"><a href="#1-安装-Tesseract、字库、jTessBoxEditor" class="headerlink" title="1. 安装 Tesseract、字库、jTessBoxEditor"></a>1. 安装 Tesseract、字库、jTessBoxEditor</h3><p>&emsp;&emsp;使用默认路径安装 <strong>Tesseract</strong> ，本文 Tesseract 版本3.0.5，安装的时候可手动勾选安装中文简体字库（ <strong>chi_sim.traineddata</strong>）用于识别中文，鉴于安装页面的下载速度较慢，可在安装完 Tesseract 之后再额外下载字体，在 Tesseract 的<a href="https://github.com/tesseract-ocr" target="_blank" rel="external">GitHub 主页</a>有字体大全：[tesseract-ocr][<a href="https://github.com/tesseract-ocr" target="_blank" rel="external">https://github.com/tesseract-ocr</a>]  . 把下载的字体如<code>chi_sim.traineddata</code> 放到安装目录下的<code>\tessdata\</code>目录下。添加 Tesseract 安装根目录到环境变量。另外安装 <strong>jTessBoxEditor</strong> 用于矫正识别效果从而训练自己的一套字库。</p>
 <a id="more"></a>
 <h3 id="2-识别"><a href="#2-识别" class="headerlink" title="2. 识别"></a>2. 识别</h3><p>&emsp;&emsp;Tesseract 没有图形化界面，使用的是命令行，如需图形页面，可使用第三方集成软件.<br>&emsp;&emsp;进入命令行，Windows下推荐使用<strong>git-bash</strong>，系统自带命令行可能找不到程序所在的path。首先<code>cd</code>到要识别的图片的目录下，然后输入识别命令：  </p>
@@ -287,15 +349,61 @@
 <p><a href="https://my.oschina.net/lixinspace/blog/60124" target="_blank" rel="external">tesseract-ocr训练方法</a></p>
 <p><a href="http://blog.wudilabs.org/entry/f25efc5f/" target="_blank" rel="external">Tesseract 3 语言数据的训练方法</a>  </p>
 
-        
-      </div>
-      
-      
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/优秀工具软件推荐——密码管理软件keepass/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/使用markdown做本地笔记软件编辑器/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -348,6 +456,15 @@
 
           <nav class="site-state motion-element">
 
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
             
 
             

@@ -80,9 +80,9 @@
 
 
 <meta name="description" content="Title: 数据表字段比较工具Date: 2017-11-28 21:14Category: 技术博客Modified: 2017-11-28 21:14Tags: 数据库Slug: DB-compareAuthors: Victor LvSummary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Victor Lv&#39;s blog">
-<meta property="og:url" content="http://langlv.me/blog/数据表字段比较工具.html">
+<meta property="og:url" content="http://langlv.me/2018/10/16/数据表字段比较工具/index.html">
 <meta property="og:site_name" content="Victor Lv&#39;s blog">
 <meta property="og:description" content="Title: 数据表字段比较工具Date: 2017-11-28 21:14Category: 技术博客Modified: 2017-11-28 21:14Tags: 数据库Slug: DB-compareAuthors: Victor LvSummary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字">
 <meta property="og:image" content="http://langlv.me/images/dataCompare-mysql.png">
@@ -123,7 +123,7 @@
 
 
 
-  <link rel="canonical" href="http://langlv.me/blog/数据表字段比较工具.html"/>
+  <link rel="canonical" href="http://langlv.me/2018/10/16/数据表字段比较工具/"/>
 
 
 
@@ -224,24 +224,86 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://langlv.me/2018/10/16/数据表字段比较工具/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吕浪">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor Lv's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>Title: 数据表字段比较工具<br>Date: 2017-11-28 21:14<br>Category: 技术博客<br>Modified: 2017-11-28 21:14<br>Tags: 数据库<br>Slug: DB-compare<br>Authors: Victor Lv<br>Summary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字段允许不一致。  </p>
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-16T15:02:33+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Title: 数据表字段比较工具<br>Date: 2017-11-28 21:14<br>Category: 技术博客<br>Modified: 2017-11-28 21:14<br>Tags: 数据库<br>Slug: DB-compare<br>Authors: Victor Lv<br>Summary: 在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字段允许不一致。  </p>
 <h4 id="一、需求描述："><a href="#一、需求描述：" class="headerlink" title="一、需求描述："></a>一、需求描述：</h4><p>&emsp;&emsp;在数据表中使用两种不同的方法（可通过某些特殊字段的数据区分）插入一条数据，比较这两条数据所有字段是否一致，同时可以设置白名单，在白名单中的字段允许不一致。</p>
 <h4 id="二、设计分析："><a href="#二、设计分析：" class="headerlink" title="二、设计分析："></a>二、设计分析：</h4><p>&emsp;&emsp;功能很简单，如果表字段很少，直接用肉眼比较很快。但如果数据表的字段非常多，用肉眼一个个去比较就太费劲了。另一种不需要写代码的方法就是，把该两条数据都select出来，然后复制整行，通过诸如UltraEdit Compare等工具自动比较两个数据是否全一致，但这种方法有一个工作量就是：不一致的字段是哪些没法提示，并且也没法自动过滤白名单。既然如此，那就写个小工具程序吧。</p>
 <a id="more"></a>
@@ -264,15 +326,61 @@
 <p>&emsp;&emsp;这里的程序我后期额外添加了<code>sql注入</code>过滤器，纯粹是为了学习下，关于<code>java 防止sql注入</code>的方法可以参考一下两个博客：<br><a href="http://www.cnblogs.com/EasonJim/p/6223216.html" target="_blank" rel="external">java程序防止sql注入的方法</a><br><a href="http://blog.csdn.net/jun0052/article/details/8541021" target="_blank" rel="external">Java防止SQL注入（转）</a></p>
 <p>&emsp;&emsp;本文组合使用了<code>通过prepareStatement.setString()拼接字符串</code>和<code>正则表达式替换特殊字符</code>这两种方法。</p>
 
-        
-      </div>
-      
-      
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/我心不安/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/用Pelican+Github搭建个人博客网站/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -325,6 +433,15 @@
 
           <nav class="site-state motion-element">
 
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
             
 
             

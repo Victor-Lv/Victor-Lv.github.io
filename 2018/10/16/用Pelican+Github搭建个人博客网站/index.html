@@ -80,9 +80,9 @@
 
 
 <meta name="description" content="Title: 用Pelican+Github搭建个人博客网站Date: 2017-06-4 19:13Category: 技术博客Modified: 2018-10-11 19:03Tags: 博客网站Slug: pelican-build-siteAuthors: Victor LvSummary: 用Pelican+Github搭建个人博客网站   创建仓库  在github上创建一个user">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Victor Lv&#39;s blog">
-<meta property="og:url" content="http://langlv.me/blog/用Pelican+Github搭建个人博客网站.html">
+<meta property="og:url" content="http://langlv.me/2018/10/16/用Pelican+Github搭建个人博客网站/index.html">
 <meta property="og:site_name" content="Victor Lv&#39;s blog">
 <meta property="og:description" content="Title: 用Pelican+Github搭建个人博客网站Date: 2017-06-4 19:13Category: 技术博客Modified: 2018-10-11 19:03Tags: 博客网站Slug: pelican-build-siteAuthors: Victor LvSummary: 用Pelican+Github搭建个人博客网站   创建仓库  在github上创建一个user">
 <meta property="og:updated_time" content="2018-10-12T01:32:21.382Z">
@@ -118,7 +118,7 @@
 
 
 
-  <link rel="canonical" href="http://langlv.me/blog/用Pelican+Github搭建个人博客网站.html"/>
+  <link rel="canonical" href="http://langlv.me/2018/10/16/用Pelican+Github搭建个人博客网站/"/>
 
 
 
@@ -219,24 +219,86 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://langlv.me/2018/10/16/用Pelican+Github搭建个人博客网站/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吕浪">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor Lv's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>Title: 用Pelican+Github搭建个人博客网站<br>Date: 2017-06-4 19:13<br>Category: 技术博客<br>Modified: 2018-10-11 19:03<br>Tags: 博客网站<br>Slug: pelican-build-site<br>Authors: Victor Lv<br>Summary: 用Pelican+Github搭建个人博客网站  </p>
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-16T15:02:33+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Title: 用Pelican+Github搭建个人博客网站<br>Date: 2017-06-4 19:13<br>Category: 技术博客<br>Modified: 2018-10-11 19:03<br>Tags: 博客网站<br>Slug: pelican-build-site<br>Authors: Victor Lv<br>Summary: 用Pelican+Github搭建个人博客网站  </p>
 <h4 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h4><p>  在github上创建一个username.github.io的仓库（username是你的github用户名）    </p>
 <h4 id="创建index-html"><a href="#创建index-html" class="headerlink" title="创建index.html"></a>创建index.html</h4><p>  在新创建的仓库中创建一个index.html文件，随便写一句话例如Hello world!上去,然后通过访问username.github.io这个url即可看到index的内容。到这步，你就相当于可以用github pages来作为自己的个人博客了，但此时url用的还是github.io，如果需要绑定自己的域名，则需要进行第三步。  </p>
 <h4 id="绑定个人域名"><a href="#绑定个人域名" class="headerlink" title="绑定个人域名"></a>绑定个人域名</h4><p>  修改域名解析的IP地址为刚才建立的仓库的地址，<strong>获取IP的方法是ping一下url</strong>：<br><code>ping username.github.io</code><br>  这步完成后在仓库中建立一个叫做CNAME的文件，复制你的域名进去，例如我的是langlv.me<br>  至此，你就可以通过你的域名来访问该仓库的内容了，试一试吧！  </p>
@@ -303,15 +365,61 @@ doall:
 <p>具体 Pelican 框架的使用参见 Pelican 官方文档：<a href="http://docs.getpelican.com/en/stable/" target="_blank" rel="external">Pelican docs</a>  </p>
 <p>参考文章：<br><a href="http://www.cnblogs.com/xueweihan/p/5249715.html" target="_blank" rel="external">用pelican搞一个自己的blog</a><br><a href="http://blog.csdn.net/u012422829/article/details/46285577" target="_blank" rel="external">利用Github建立你的个人网站</a><br><a href="http://docs.getpelican.com/en/stable/" target="_blank" rel="external">Pelican docs</a><br><a href="http://www.tuicool.com/articles/6ZfEBrQ" target="_blank" rel="external">用pelican在github上创建自己的博客!</a>    </p>
 
-        
-      </div>
-      
-      
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/数据表字段比较工具/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/裸奔于互联网前应三思/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -364,6 +472,15 @@ doall:
 
           <nav class="site-state motion-element">
 
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
             
 
             

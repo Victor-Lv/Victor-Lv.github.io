@@ -80,9 +80,9 @@
 
 
 <meta name="description" content="Title: Just a simple demo: SpringMVC + MybatisDate: 2018-8-22 12:52Category: 技术博客Modified: 2018-8-22 12:52Tags: spring, mybatis, springMVC, Java-WebSlug: demo-springMVCAuthors: Victor LvSummary: Just">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Victor Lv&#39;s blog">
-<meta property="og:url" content="http://langlv.me/blog/Just a simple demo SpringMVC + Mybatis.html">
+<meta property="og:url" content="http://langlv.me/2018/10/16/Just a simple demo SpringMVC + Mybatis/index.html">
 <meta property="og:site_name" content="Victor Lv&#39;s blog">
 <meta property="og:description" content="Title: Just a simple demo: SpringMVC + MybatisDate: 2018-8-22 12:52Category: 技术博客Modified: 2018-8-22 12:52Tags: spring, mybatis, springMVC, Java-WebSlug: demo-springMVCAuthors: Victor LvSummary: Just">
 <meta property="og:image" content="http://langlv.me/images/dispatcherServlet.png">
@@ -124,7 +124,7 @@
 
 
 
-  <link rel="canonical" href="http://langlv.me/blog/Just a simple demo SpringMVC + Mybatis.html"/>
+  <link rel="canonical" href="http://langlv.me/2018/10/16/Just a simple demo SpringMVC + Mybatis/"/>
 
 
 
@@ -225,24 +225,86 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://langlv.me/2018/10/16/Just a simple demo SpringMVC + Mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吕浪">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor Lv's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>Title: Just a simple demo: SpringMVC + Mybatis<br>Date: 2018-8-22 12:52<br>Category: 技术博客<br>Modified: 2018-8-22 12:52<br>Tags: spring, mybatis, springMVC, Java-Web<br>Slug: demo-springMVC<br>Authors: Victor Lv<br>Summary: Just a simple demo: SpringMVC + Mybatis  </p>
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-16T15:02:33+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Title: Just a simple demo: SpringMVC + Mybatis<br>Date: 2018-8-22 12:52<br>Category: 技术博客<br>Modified: 2018-8-22 12:52<br>Tags: spring, mybatis, springMVC, Java-Web<br>Slug: demo-springMVC<br>Authors: Victor Lv<br>Summary: Just a simple demo: SpringMVC + Mybatis  </p>
 <h3 id="Just-a-simple-demo-SpringMVC-Mybatis"><a href="#Just-a-simple-demo-SpringMVC-Mybatis" class="headerlink" title="Just a simple demo: SpringMVC + Mybatis"></a>Just a simple demo: SpringMVC + Mybatis</h3><h4 id="1-web-xml"><a href="#1-web-xml" class="headerlink" title="1. web.xml"></a>1. web.xml</h4><p>First configure <code>web.xml</code>  which is used for Spring and SpringMVC:<br><em>web.xml</em><br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="php"><span class="meta">&lt;?</span>xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span><span class="meta">?&gt;</span></span></div><div class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">version</span>=<span class="string">"2.5"</span></span></div><div class="line">         <span class="attr">xmlns</span>=<span class="string">"http://java.sun.com/xml/ns/javaee"</span></div><div class="line">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://java.sun.com/xml/ns/javaee</span></div><div class="line">	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">servlet</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!-- This servlet-name links to the configuration file: app-servlet.xml --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>app<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span></div><div class="line">            org.springframework.web.servlet.DispatcherServlet</div><div class="line">        <span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>app<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <p>Here,  <code>web.xml</code> configure the important element <strong>DispatcherServlet</strong> and map it into <em>/</em> url ( website root url ). If external context configuration is needed, we can specify external configuration in this way:</p>
@@ -269,15 +331,61 @@
 <p>Insert a user and then redirect to success page:</p>
 <p><img src="http://langlv.me/images/demo_res3.png" alt="insertUser"></p>
 
-        
-      </div>
-      
-      
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/Hibernate 与 Mybatis 入门使用/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/Python判断操作系统类型/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -330,6 +438,15 @@
 
           <nav class="site-state motion-element">
 
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
             
 
             

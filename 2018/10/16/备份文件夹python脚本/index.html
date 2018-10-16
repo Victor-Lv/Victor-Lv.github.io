@@ -80,9 +80,9 @@
 
 
 <meta name="description" content="Title: 备份文件夹python脚本Category: 技术博客Date: 2017-8-19 22:10Modified: 2017-8-19 22:10Tags: pythonSlug: backup-directories-pythonAuthors: Victor LvSummary: 出于备份网站内容的考虑，故花了点时间写了个能够备份文件夹的 Python 小脚本，用于把自己写的博文">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Victor Lv&#39;s blog">
-<meta property="og:url" content="http://langlv.me/blog/备份文件夹python脚本.html">
+<meta property="og:url" content="http://langlv.me/2018/10/16/备份文件夹python脚本/index.html">
 <meta property="og:site_name" content="Victor Lv&#39;s blog">
 <meta property="og:description" content="Title: 备份文件夹python脚本Category: 技术博客Date: 2017-8-19 22:10Modified: 2017-8-19 22:10Tags: pythonSlug: backup-directories-pythonAuthors: Victor LvSummary: 出于备份网站内容的考虑，故花了点时间写了个能够备份文件夹的 Python 小脚本，用于把自己写的博文">
 <meta property="og:image" content="http://langlv.me/images/python_backup_dir.png">
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="http://langlv.me/blog/备份文件夹python脚本.html"/>
+  <link rel="canonical" href="http://langlv.me/2018/10/16/备份文件夹python脚本/"/>
 
 
 
@@ -221,24 +221,86 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://langlv.me/2018/10/16/备份文件夹python脚本/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吕浪">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor Lv's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>Title: 备份文件夹python脚本<br>Category: 技术博客<br>Date: 2017-8-19 22:10<br>Modified: 2017-8-19 22:10<br>Tags: python<br>Slug: backup-directories-python<br>Authors: Victor Lv<br>Summary: 出于备份网站内容的考虑，故花了点时间写了个能够备份文件夹的 Python 小脚本，用于把自己写的博文目录备份为zip并放到指定目录。功能很简单，代码量也很少  </p>
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-16T15:02:33+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Title: 备份文件夹python脚本<br>Category: 技术博客<br>Date: 2017-8-19 22:10<br>Modified: 2017-8-19 22:10<br>Tags: python<br>Slug: backup-directories-python<br>Authors: Victor Lv<br>Summary: 出于备份网站内容的考虑，故花了点时间写了个能够备份文件夹的 Python 小脚本，用于把自己写的博文目录备份为zip并放到指定目录。功能很简单，代码量也很少  </p>
 <p>&emsp;&emsp;出于备份网站内容的考虑，故花了点时间写了个能够备份文件夹的 Python 小脚本，用于把自己写的博文目录备份为zip并放到指定目录。功能很简单，代码量也很少。  </p>
 <a id="more"></a>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/python</span></div><div class="line"><span class="comment"># -*- coding: UTF-8 -*- </span></div><div class="line"><span class="string">'''</span></div><div class="line">A tool using to backup directory.</div><div class="line">Author：Victor Lv</div><div class="line">Date: 2017-8-19</div><div class="line">'''</div><div class="line"></div><div class="line"><span class="keyword">import</span> os, sys, time, shutil</div><div class="line"></div><div class="line"><span class="comment"># You can modify the source path and destination path,</span></div><div class="line"><span class="comment"># all the files / directories in srcPath\\ will be zip to desPath\\%DATE%.zip</span></div><div class="line">SRC_PATH = <span class="string">"D:\\mysite\\Hexo"</span></div><div class="line">DES_PATH = <span class="string">"D:\\mysite\\backup\\"</span></div><div class="line"></div><div class="line">CURRENT_TIME = time.strftime(<span class="string">"%Y-%m-%d_%H-%M"</span>,time.localtime())</div><div class="line">ZIP_NAME = DES_PATH + CURRENT_TIME + <span class="string">"_backup"</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">error_throw</span><span class="params">(error_message)</span>:</span></div><div class="line">	<span class="keyword">print</span> error_message</div><div class="line">	sys.exit(<span class="number">1</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_src_path</span><span class="params">()</span>:</span></div><div class="line">	<span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(SRC_PATH):</div><div class="line">		print(SRC_PATH)</div><div class="line">		error_throw(<span class="string">"Source path does not exist."</span>)</div><div class="line">	<span class="comment">#elif not os.path.isdir(SRC_PATH):</span></div><div class="line">	<span class="comment">#	error_throw("Source path isn't a directory.")</span></div><div class="line">	<span class="keyword">else</span>:</div><div class="line">		<span class="keyword">pass</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_des_path</span><span class="params">()</span>:</span></div><div class="line">	<span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(DES_PATH):</div><div class="line">		print(<span class="string">"""Destination path does not exist.</span></div><div class="line">Automatically create the directory...""")</div><div class="line">		os.mkdir(DES_PATH)</div><div class="line">	<span class="keyword">elif</span> <span class="keyword">not</span> os.path.isdir(DES_PATH):</div><div class="line">		error_throw(<span class="string">"Destination path isn't a directory."</span>)</div><div class="line">	<span class="keyword">else</span>:</div><div class="line">		<span class="keyword">pass</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">copy_dir</span><span class="params">()</span>:</span></div><div class="line">	shutil.make_archive(ZIP_NAME, <span class="string">'zip'</span>, SRC_PATH)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">check_result</span><span class="params">()</span>:</span></div><div class="line">	<span class="keyword">if</span> os.path.exists(ZIP_NAME+<span class="string">'.zip'</span>):</div><div class="line">		print(<span class="string">"Backup success."</span>)</div><div class="line">	<span class="keyword">else</span>:</div><div class="line">		error_throw(<span class="string">"Backup failed."</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></div><div class="line">	check_src_path()</div><div class="line">	check_des_path()</div><div class="line">	copy_dir()</div><div class="line">	check_result()</div><div class="line">	sys.exit(<span class="number">0</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">	main()</div></pre></td></tr></table></figure>
@@ -247,15 +309,61 @@
 <h5 id="shutil-make-archive-模块"><a href="#shutil-make-archive-模块" class="headerlink" title="shutil.make_archive 模块"></a><code>shutil.make_archive</code> 模块</h5><p>&emsp;&emsp;用于打包成zip文件，参考教程：<br>&emsp;&emsp;<a href="https://stackoverflow.com/questions/1855095/how-to-create-a-zip-archive-of-a-directory" target="_blank" rel="external">How to create a zip archive of a directory ? stackoverflow</a></p>
 <p>最后效果如下：<br><img src="http://langlv.me/images/python_backup_dir.png" alt="演示效果图"></p>
 
-        
-      </div>
-      
-      
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/在网页中插入音乐/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/成也性格败也性格，读《史记之项羽本纪》/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -308,6 +416,15 @@
 
           <nav class="site-state motion-element">
 
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
             
 
             

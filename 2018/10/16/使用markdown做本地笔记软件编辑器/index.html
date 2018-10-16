@@ -80,9 +80,9 @@
 
 
 <meta name="description" content="Title: 使用markdown做本地笔记软件/编辑器Date: 2017-9-20 11:34Category: 技术博客Modified: 2017-9-20 11:34Tags: 笔记, markdownSlug: use_markdown_as_noteAuthors: Victor LvSummary: 使用markdown做本地笔记软件/编辑器   &amp;emsp;&amp;emsp;因公司一众">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Victor Lv&#39;s blog">
-<meta property="og:url" content="http://langlv.me/blog/使用markdown做本地笔记软件编辑器.html">
+<meta property="og:url" content="http://langlv.me/2018/10/16/使用markdown做本地笔记软件编辑器/index.html">
 <meta property="og:site_name" content="Victor Lv&#39;s blog">
 <meta property="og:description" content="Title: 使用markdown做本地笔记软件/编辑器Date: 2017-9-20 11:34Category: 技术博客Modified: 2017-9-20 11:34Tags: 笔记, markdownSlug: use_markdown_as_noteAuthors: Victor LvSummary: 使用markdown做本地笔记软件/编辑器   &amp;emsp;&amp;emsp;因公司一众">
 <meta property="og:updated_time" content="2018-10-12T01:13:19.387Z">
@@ -118,7 +118,7 @@
 
 
 
-  <link rel="canonical" href="http://langlv.me/blog/使用markdown做本地笔记软件编辑器.html"/>
+  <link rel="canonical" href="http://langlv.me/2018/10/16/使用markdown做本地笔记软件编辑器/"/>
 
 
 
@@ -219,35 +219,143 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://langlv.me/2018/10/16/使用markdown做本地笔记软件编辑器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吕浪">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Victor Lv's blog">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline"></h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <p>Title: 使用markdown做本地笔记软件/编辑器<br>Date: 2017-9-20 11:34<br>Category: 技术博客<br>Modified: 2017-9-20 11:34<br>Tags: 笔记, markdown<br>Slug: use_markdown_as_note<br>Authors: Victor Lv<br>Summary: 使用markdown做本地笔记软件/编辑器  </p>
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-16T15:02:33+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Title: 使用markdown做本地笔记软件/编辑器<br>Date: 2017-9-20 11:34<br>Category: 技术博客<br>Modified: 2017-9-20 11:34<br>Tags: 笔记, markdown<br>Slug: use_markdown_as_note<br>Authors: Victor Lv<br>Summary: 使用markdown做本地笔记软件/编辑器  </p>
 <p>&emsp;&emsp;因公司一众云笔记软件都被屏蔽用不了，只能用本地笔记，考虑到很多笔记要放图片，一开始只能用word，但那种打开速度和排版实感痛苦，所以只能是把无图片的笔记用markdown记录，有图片的用word。然而，今天才知道<strong>markdown其实是可以插入本地图片的</strong>！太棒了，那markdown作为本地笔记记录方式实在太适合了，不仅有漂亮的代码排版，字体排版，还能带目录，功能相比word效率高太多，我使用的是haroopad-markdown编辑器。<br>&emsp;&emsp;插入本地图片方法很简单，直接用相对路径或绝对路径代替http-url即可，也有其他更666的方法，详见：<a href="https://www.zhihu.com/question/21065229" target="_blank" rel="external">Markdown插入图片–知乎</a><br>&emsp;&emsp;然后发现<strong>markdown导出成html文件的功能更棒</strong>！例如我用haroopad软件把markdown文件导出成html文件会把我预览区的样式全部展示出来，唯独一点需要手工修改，那就是html的图片标签，因为默认它会把图片的源地址写成绝对路径，但一旦把图片和html文件移动到别处，那就不会显示图片了。然后我发现了个很简便的解决办法：<strong>把html文件的<code>&lt;img src&gt;</code></strong>标签修改一下，改成相对路径，例如把图片放在跟该html文件同目录下，则直接写成<code>&lt;img src=pic.jpg&gt;</code>，在另一个目录下，则写成类似<code>&lt;img src=./image/pic.jpg&gt;</code>。然后后期传输的时候只需要把html和这个图片一块传输就行了，只要这两个文件的相对路径没被改变，图片即可正确显示。<br>&emsp;&emsp;然后把再<strong>通过chrome浏览器等把html直接转成pdf文件</strong>，那直接连图片都不用传输了，直接传一个pdf就足够了，非常棒！<br>&emsp;&emsp;当然，也可以<strong>直接把md转pdf</strong>，可参考教程：<a href="https://www.zhihu.com/question/20849824" target="_blank" rel="external">如何把 Markdown 文件转化为 PDF</a></p>
 
-        
-      </div>
-      
-      
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/使用 Tesseract 进行文字识别/" rel="next" title="">
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/在网页中插入音乐/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -291,6 +399,15 @@
 
           <nav class="site-state motion-element">
 
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
             
 
             
