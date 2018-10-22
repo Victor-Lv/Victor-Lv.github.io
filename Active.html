@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 初识ActiveMQ</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>初识ActiveMQ</h1>
+2018-10-19
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><p><a href="http://activemq.apache.org"><code>ActiveMQ</code></a>是一个遵循<code>JMS</code>规范的消息服务系统，开源，纯Java实现，但可以跨语言使用。
+ActiveMQ（JMS）的主要有以下几个使用场景：</p>
+<blockquote>
+<ol>
+<li>系统整合：同构/异构系统整合，分布式环境中</li>
+<li>降低模块间耦合：比如AB两个系统，A性能瓶颈或宕机、系统差不干扰B</li>
+<li>实现异步:1.推消息 2.削峰请求</li>
+<li>数据同步:web应用-&gt;缓存，搜索，db</li>
+</ol>
+</blockquote>
+<h2>JMS 支持两种消息模型：</h2>
+<h3>Point-to-Point（P2P）点对点模型</h3>
+<p>一种是 <strong>Point-to-Point（P2P）点对点模型</strong>，一个生产者对应一个消费者，生产者将消息发送到Queue-队列中，消息消费者从队列中接收消息。P2P 模式好比两人之间的信件传输，生产者A君将信件（Message）寄给信箱，指明它唯一的收件人B君，在B君上来取走之前，信件将一直存在于信箱当中，当作为消费者的B君出现并且取走了信件，信箱里也就没了这个信件了。</p>
+<h3>Publish/Subscribe 发布/订阅模型</h3>
+<p>另一种是 <strong>Publish/Subscribe 发布/订阅模型</strong>，此时，消息的双方不再是一对一的唯一对应关系了，而是一对多（一个消息发送者对应多个消息接收者）的关系。在这种模式下，消息中介叫做<code>Topic</code>，消息的发布者需向<code>Topic</code>发送消息，而消息的订阅者则需要在相应的 Topic 上进行注册，以便接收该 Topic 的消息。与 P2P 消息模型不同，Pub/Sub 模式下，消息发布者的消息将会被自动发送给所有订阅了该 Topic 的消息订阅者。<strong>普通订阅</strong>（默认）模式下，当消息接收者在某段时间断开了与消息服务器的连接时，在这个时间段内传递过来的消息将会丢失（相当于认为接收者已经取消了订阅）； JMS 提供了<strong>持久订阅</strong>模式，<strong>当 Topic 被声明为持久订阅，并且消息接收者也注册为持久订阅者</strong>，那么系统仍会为该持久订阅者保留断连这段时间所产生的消息，直至该接收者重新上线并“消费”消息。Pub/Sub 模式，好比所有会员，包括付费会员[持久订阅者]和普通会员[非持久订阅者]，大家都在一个微信群（Topic），某天群主（Publisher）在群里发了个红包（Message），群里所有会员（Subcriber）每人一个，对于付费会员（持久订阅者），即时它暂时不在线，系统也会为它保留红包，等它过后重新上线还能认领该红包，而非持久订阅者（普通会员）如果没即时领取，则将会失去该红包。另外，也可以像目前微信红包做的那样，设置一个红包（消息）过期时间，如果超过了设定的时间，付费会员（持久订阅者）仍未领取（消费），则系统会将该红包（消息）回收（丢弃）。</p>
+<p>JMS 针对上述两种模式都可以设置消息的过期时间。</p>
+<h2>Demo</h2>
+<p>针对 ActiveMQ，本文下载了其 Windows 版搭建了一个单机版的用 Java 实现小 demo，搭建步骤和代码如下：</p>
+<h3>安装和部署 ActiveMQ Server</h3>
+<p>首先从<a href="http://activemq.apache.org"> Apache ActiveMQ 官网</a>下载 ActiveMQ Windows 版安装包，5.15.6 Release 版本<a href="http://activemq.apache.org/activemq-5156-release.html">下载地址</a>:http://activemq.apache.org/activemq-5156-release.html。
+下载完成后无需安装直接运行 ActiveMQ Server：
+进入<code>...apache-activemq-5.15.6/bin</code>目录，在命令行中执行 start 命令：</p>
+<div class="highlight"><pre><span></span>./activemq start
+</pre></div>
+
+
+<p>执行后没报错的话会输入类似下面的信息：
+<img alt="启动" src="http://langlv.me/images/ActiveMQ1.png">
+可以使用浏览器登录 ActiveMQ Server 后台确认 Server 是否启动成功，默认登录地址：<a href="http://localhost:8161/admin/">http://localhost:8161/admin/</a></p>
+<p>登录成功可见如下页面：
+<img alt="后台页面" src="http://localhost:8161/admin/"></p>
+<p>好了，ActiveMQ Server 已经启动了，下面我们用 Java 去实现一个客户端调用，包括消息生产者和消费者。</p>
+<h3>P2P 模式版</h3>
+<p>上面说到 JMS 有两种消息模型，首先来看更简单些的 P2P 模型的 demo。</p>
+<h4>引入 jar 包依赖</h4>
+<p>首先在 Java 工程中引入刚才 ActiveMQ 下载目录下的 Java 依赖包 <code>activemq-all-5.15.6.jar</code>，Maven 工程的话在 pom.xml 中加入下述语句：</p>
+<div class="highlight"><pre><span></span>    <span class="c">&lt;!-- jar version configuration --&gt;</span>
+    <span class="nt">&lt;properties&gt;</span>
+        <span class="nt">&lt;ActiveMQ.version&gt;</span>5.11.4<span class="nt">&lt;/ActiveMQ.version&gt;</span>
+    <span class="nt">&lt;/properties&gt;</span>
+
+    <span class="nt">&lt;dependencies&gt;</span>
+
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.apache.activemq<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>activemq-all<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${ActiveMQ.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+</pre></div>
+
+
+<h4>创建 Producer</h4>
+<p>然后创建一个消息生产者：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnectionFactory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.command.ActiveMQObjectMessage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.command.ActiveMQTextMessage</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.jms.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: QueueProducer</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/19 9:46</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">QueueProducer</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">createQueueProducer</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JMSException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+        <span class="c1">//1. 建立连接工厂，这里我的 ActiveMQ server 起在默认url</span>
+        <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActiveMQConnectionFactory</span><span class="o">(</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_USER</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_PASSWORD</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_BROKER_URL</span><span class="o">);</span>
+
+        <span class="n">MessageProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="kt">boolean</span> <span class="n">transacted</span> <span class="o">=</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">FALSE</span><span class="o">;</span> <span class="c1">//消息是否使用事务</span>
+        <span class="kt">int</span> <span class="n">acknowledgeMode</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">;</span> <span class="c1">//消息确认模式，AUTO_ACKNOWLEDGE--系统自动发送签收通知</span>
+        <span class="n">String</span> <span class="n">queueName</span> <span class="o">=</span> <span class="s">&quot;Queue1&quot;</span><span class="o">;</span> <span class="c1">//队列名</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">//2. 从连接工厂获取一个连接</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">start</span><span class="o">();</span> <span class="c1">//进行连接</span>
+
+            <span class="c1">//3. 从本次连接中建立一个 session 会话</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="n">transacted</span><span class="o">,</span> <span class="n">acknowledgeMode</span><span class="o">);</span>
+
+            <span class="c1">//4. 创建/选择 一个消息队列</span>
+            <span class="n">Destination</span> <span class="n">destination</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createQueue</span><span class="o">(</span><span class="n">queueName</span><span class="o">);</span>
+
+            <span class="c1">//5. 创建生产者</span>
+            <span class="n">producer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createProducer</span><span class="o">(</span><span class="n">destination</span><span class="o">);</span>
+
+            <span class="c1">//6. 传送消息</span>
+
+            <span class="c1">//传送 String文本消息</span>
+            <span class="n">TextMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTextMessage</span><span class="o">(</span><span class="s">&quot;Hello World!&quot;</span><span class="o">);</span>
+            <span class="n">producer</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="c1">//7. 关闭连接，回收资源</span>
+            <span class="n">producer</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">JMSException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+        <span class="n">createQueueProducer</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>消息生产者的创建要经过几个步骤，前三个步骤跟 Mybatis/Hibernate 框架的处理差不多：
+1. 创建 <code>ConnectionFactory</code> ：也是类似 Mybatis/Hibernate 的连接工厂，实际项目中一般只会在项目初始化的时候创建一个连接工厂，后续每创建一个 Producer 只需要从工厂中直接获取连接即可；
+2. 通过 <code>ConnectionFactory</code> 获取一个 <code>Connection</code>，并与 ActiveMQ Server 进行连接；
+3. 通过 <code>Connection</code> 获取一个 <code>Session</code>会话；
+4. 创建/选取一个消息队列： 根据 QueueName 在 ActiveMQ Server 中创建一个消息队列，如果该名称的队列在 Server 中已经存在，则系统会直接沿用并选中该队列，与该消息队列绑定之后，就可以生成一个 <code>Session</code>会话了；
+5. 创建消息 Producer：目的地（Destination）和履带（Connecttion）都有了，就可以把生产机器（Producer）拿上来了。</p>
+<p>因为我刚才启用 ActiveMQ Server 都是用的默认配置，所以在连接工厂处使用默认的 url、 username 和 userPassword 即可。
+上面发的是一个 String 文本消息对象，也可以发送一个更复杂的消息对象到队列中：</p>
+<div class="highlight"><pre><span></span><span class="c1">//传送 Object 对象消息</span>
+<span class="n">WorkMessage</span> <span class="n">workMessage</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WorkMessage</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;Do something&quot;</span><span class="o">);</span>
+<span class="cm">/**</span>
+<span class="cm"> * 这里也可以采用 JMS 原生的 ObjectMessage；</span>
+<span class="cm"> * 使用 ActiveMQ 的 ObjectMessage 有诸如压缩消息等更多功能，但带入了侵入式编程</span>
+<span class="cm"> */</span>
+
+<span class="n">ActiveMQObjectMessage</span> <span class="n">objectMessage</span> <span class="o">=</span>
+        <span class="o">(</span><span class="n">ActiveMQObjectMessage</span><span class="o">)</span> <span class="n">session</span><span class="o">.</span><span class="na">createObjectMessage</span><span class="o">(</span><span class="n">workMessage</span><span class="o">);</span>
+<span class="n">objectMessage</span><span class="o">.</span><span class="na">compress</span><span class="o">();</span> <span class="c1">//压缩下message</span>
+<span class="n">producer</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">objectMessage</span><span class="o">);</span>
+</pre></div>
+
+
+<p>上面代码中的 WorkMessage 构造如下：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: WorkMessage</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/19 10:32</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WorkMessage</span> <span class="kd">implements</span> <span class="n">Serializable</span><span class="o">{</span>
+
+    <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">command</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">WorkMessage</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">command</span><span class="o">){</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setId</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getCommand</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">command</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCommand</span><span class="o">(</span><span class="n">String</span> <span class="n">command</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;ID: &quot;</span> <span class="o">+</span> <span class="n">id</span> <span class="o">+</span><span class="s">&quot;, Command: &quot;</span> <span class="o">+</span> <span class="n">command</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>好了，运行上面的 Producer 程序，即可告诉 Server 创建一个名为<code>Queue1</code>的消息队列，并发送第一个消息<code>Hello World!</code>。</p>
+<p>可以去 ActiveMQ Server 的后台查看下是否已添加了该 Queue：
+<img alt="Queue" src="http://langlv.me/images/ActiveMQ3.png"></p>
+<p>可以发现成功创建了一个 Name 是 Queue1 的队列，并且已经有一个消息入队了（Messages Enqueued == 1），目前该消息还没被消费（Messages Dequeued  == 0）。</p>
+<h4>创建 Consumer</h4>
+<p>消费者的创建跟生产者的差不多，代码如下：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnectionFactory</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.jms.*</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: QueueConsumer</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/19 9:41</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">QueueConsumer</span> <span class="o">{</span>
+
+    <span class="c1">//消费者--P2P模式</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">QueueConsumer</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActiveMQConnectionFactory</span><span class="o">(</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_USER</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_PASSWORD</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_BROKER_URL</span><span class="o">);</span>
+
+        <span class="n">MessageProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">MessageConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="kt">boolean</span> <span class="n">transacted</span> <span class="o">=</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">FALSE</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">acknowledgeMode</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">queueName</span> <span class="o">=</span> <span class="s">&quot;Queue1&quot;</span><span class="o">;</span> <span class="c1">//队列名</span>
+        <span class="n">String</span> <span class="n">clientID</span> <span class="o">=</span> <span class="s">&quot;QueueConsumer1&quot;</span><span class="o">;</span> <span class="c1">//消费者ID</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">setClientID</span><span class="o">(</span><span class="n">clientID</span><span class="o">);</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="n">transacted</span><span class="o">,</span> <span class="n">acknowledgeMode</span><span class="o">);</span>
+            <span class="n">Destination</span> <span class="n">destination</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createQueue</span><span class="o">(</span><span class="n">queueName</span><span class="o">);</span>
+
+            <span class="c1">//创建队列消费者</span>
+            <span class="n">consumer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createConsumer</span><span class="o">(</span><span class="n">destination</span><span class="o">);</span>
+
+            <span class="c1">//启用消息监听</span>
+            <span class="n">consumer</span><span class="o">.</span><span class="na">setMessageListener</span><span class="o">(</span><span class="k">new</span> <span class="n">MessageListener</span><span class="o">()</span> <span class="o">{</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="c1">//接收String文本</span>
+                    <span class="n">TextMessage</span> <span class="n">textMessage</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">message</span><span class="o">;</span>
+                    <span class="k">try</span> <span class="o">{</span>
+                        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">textMessage</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+                    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">}</span>
+        <span class="c1">//不close连接，持续监听</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">QueueConsumer</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>运行上述程序，将会创建一个 ID 为<code>QueueConsumer1</code> 的消费者，并启用消息监听，进程将会持续监听来自<code>Queue1</code>队列的消息，因为刚才我们已经在队列里塞了一个<code>Hello World!</code>的消息，所以在标准输出流会输出<code>Hello World!</code>字眼。
+然后刷新下 Server 后台，可以发现<code>Queue1</code>队列多了一个消费者（Number Of Consumers == 1），并且消息出列数变为了1（Messages Dequeued == 1）也就是有一个消息被消费了。
+<img alt="Consumer" src="http://langlv.me/images/ActiveMQ4.png"></p>
+<p>上面代码中的启用监听部分，我们可以把它独立出来单独实现一个 Listener 来处理消息：</p>
+<div class="highlight"><pre><span></span><span class="c1">//创建队列消费者</span>
+<span class="n">consumer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createConsumer</span><span class="o">(</span><span class="n">destination</span><span class="o">);</span>
+<span class="c1">//启用自定义的 QueueListener 监听者</span>
+<span class="n">consumer</span><span class="o">.</span><span class="na">setMessageListener</span><span class="o">(</span><span class="k">new</span> <span class="n">QueueListener</span><span class="o">());</span>
+</pre></div>
+
+
+<p>自定义的 <code>QueueListener</code>如下：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.activemq.command.ActiveMQObjectMessage</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.jms.JMSException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.jms.Message</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">javax.jms.MessageListener</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: QueueListener</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/19 11:19</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">QueueListener</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+<span class="c1">//            //接收String文本</span>
+<span class="c1">//            TextMessage textMessage = (TextMessage) message;</span>
+
+        <span class="c1">//接收对象</span>
+        <span class="n">ActiveMQObjectMessage</span> <span class="n">response</span> <span class="o">=</span> <span class="o">(</span><span class="n">ActiveMQObjectMessage</span><span class="o">)</span> <span class="n">message</span><span class="o">;</span>
+        <span class="n">ActiveMQObjectMessage</span> <span class="n">activeMQObjectMessage</span> <span class="o">=</span> <span class="o">(</span><span class="n">ActiveMQObjectMessage</span><span class="o">)</span> <span class="n">response</span><span class="o">.</span><span class="na">copy</span><span class="o">();</span> <span class="c1">//copy一个复本出来使用</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+<span class="c1">//                System.out.println(textMessage.getText());</span>
+            <span class="n">WorkMessage</span> <span class="n">workMessage</span> <span class="o">=</span> <span class="o">(</span><span class="n">WorkMessage</span><span class="o">)</span> <span class="n">activeMQObjectMessage</span><span class="o">.</span><span class="na">getObject</span><span class="o">();</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">workMessage</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3>Publish / Subscribe 模式版</h3>
+<p>Pub / Sub 模式下消息生产者和消费者的创建跟 P2P 模式的大体相似，不同于 P2P 模式的创建一个 Queue Destination ，Pub / Sub 模式创建的是 <strong>Topic</strong></p>
+<h4>Topic 消息发布者</h4>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnectionFactory</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.jms.*</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: TopicPublisher</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/18 14:34</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TopicPublisher</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">createTopicProducer</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+
+        <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActiveMQConnectionFactory</span><span class="o">(</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_USER</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_PASSWORD</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_BROKER_URL</span><span class="o">);</span>
+
+        <span class="n">MessageProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">topicName</span> <span class="o">=</span> <span class="s">&quot;MyTopic&quot;</span><span class="o">;</span>
+        <span class="kt">boolean</span> <span class="n">transacted</span> <span class="o">=</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">FALSE</span><span class="o">;</span> <span class="c1">//消息是否使用事务</span>
+        <span class="kt">int</span> <span class="n">acknowledgeMode</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">;</span> <span class="c1">//消息确认模式，AUTO_ACKNOWLEDGE--系统自动发送签收通知</span>
+        <span class="c1">//*设置是否持久订阅: PERSISTENT--持久订阅模式; NON_PERSISTENT--普通订阅模式</span>
+        <span class="kt">int</span> <span class="n">deliveryMode</span> <span class="o">=</span> <span class="n">DeliveryMode</span><span class="o">.</span><span class="na">PERSISTENT</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+
+            <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="n">transacted</span><span class="o">,</span> <span class="n">acknowledgeMode</span><span class="o">);</span>
+
+            <span class="c1">//根据 topicName 创建/选择一个 Topic</span>
+            <span class="n">Topic</span> <span class="n">topic</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTopic</span><span class="o">(</span><span class="n">topicName</span><span class="o">);</span>
+
+            <span class="c1">//生产者</span>
+            <span class="n">producer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createProducer</span><span class="o">(</span><span class="n">topic</span><span class="o">);</span>
+
+            <span class="n">producer</span><span class="o">.</span><span class="na">setDeliveryMode</span><span class="o">(</span><span class="n">deliveryMode</span><span class="o">);</span>
+
+            <span class="n">TextMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTextMessage</span><span class="o">(</span><span class="s">&quot;This is message.&quot;</span><span class="o">);</span>
+            <span class="n">producer</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">producer</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="n">session</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+        <span class="o">}</span>
+
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">createTopicProducer</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>上面的代码创建了一个名为<code>Topic1</code>的Topic。
+在创建 Topic 时，可以指定消息的分发模式--DeliveryMode：<em>PERSISTENT--持久订阅模式; NON_PERSISTENT--普通订阅模式</em>，具体两种模式的作用如篇首所述。</p>
+<h4>Non Persistent Subscriber</h4>
+<p>普通订阅 / 非持久订阅的 Subscriber 创建没啥特殊的，实现如下：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnectionFactory</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.jms.*</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: NonPersistentSubscriber</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/19 9:36</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">NonPersistentSubscriber</span> <span class="o">{</span>
+
+    <span class="c1">//普通订阅消费者</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">nonPersistent</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActiveMQConnectionFactory</span><span class="o">(</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_USER</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_PASSWORD</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_BROKER_URL</span><span class="o">);</span>
+
+        <span class="n">MessageProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">MessageConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">clientID</span> <span class="o">=</span> <span class="s">&quot;nonPersistent_Consumer&quot;</span><span class="o">;</span>
+        <span class="kt">boolean</span> <span class="n">transacted</span> <span class="o">=</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">FALSE</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">acknowledgeMode</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">topicName</span> <span class="o">=</span> <span class="s">&quot;MyTopic&quot;</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">setClientID</span><span class="o">(</span><span class="n">clientID</span><span class="o">);</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="n">transacted</span><span class="o">,</span> <span class="n">acknowledgeMode</span><span class="o">);</span>
+            <span class="n">Topic</span> <span class="n">topic</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTopic</span><span class="o">(</span><span class="n">topicName</span><span class="o">);</span>
+
+            <span class="c1">//创建普通订阅的消费者</span>
+            <span class="n">consumer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createConsumer</span><span class="o">(</span><span class="n">topic</span><span class="o">);</span>
+
+            <span class="n">consumer</span><span class="o">.</span><span class="na">setMessageListener</span><span class="o">(</span><span class="k">new</span> <span class="n">MessageListener</span><span class="o">()</span> <span class="o">{</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">TextMessage</span> <span class="n">textMessage</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">message</span><span class="o">;</span>
+                    <span class="k">try</span> <span class="o">{</span>
+                        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">textMessage</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+                    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">}</span>
+        <span class="c1">//不close连接，持续监听</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">nonPersistent</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h4>Persistent Subscriber</h4>
+<p>持久订阅的 Subscriber 创建有些不同，先看代码：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">ActiveMQ</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnection</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.apache.activemq.ActiveMQConnectionFactory</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.jms.*</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: PersistentSubscriber</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/10/18 11:23</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">PersistentSubscriber</span> <span class="o">{</span>
+
+    <span class="c1">//持久订阅消费者1</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">persistentTest1</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActiveMQConnectionFactory</span><span class="o">(</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_USER</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_PASSWORD</span><span class="o">,</span>
+                <span class="n">ActiveMQConnection</span><span class="o">.</span><span class="na">DEFAULT_BROKER_URL</span><span class="o">);</span>
+
+        <span class="n">MessageProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">MessageConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">clientID</span> <span class="o">=</span> <span class="s">&quot;persistent_Consumer&quot;</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">topicName</span> <span class="o">=</span> <span class="s">&quot;MyTopic&quot;</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">subscribeName</span> <span class="o">=</span> <span class="s">&quot;Consumer&quot;</span><span class="o">;</span>
+        <span class="kt">boolean</span> <span class="n">transacted</span> <span class="o">=</span> <span class="n">Boolean</span><span class="o">.</span><span class="na">FALSE</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">acknowledgeMode</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">;</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">setClientID</span><span class="o">(</span><span class="n">clientID</span><span class="o">);</span> <span class="c1">//持久订阅必须设置ClientID</span>
+            <span class="n">connection</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="n">transacted</span><span class="o">,</span> <span class="n">acknowledgeMode</span><span class="o">);</span>
+            <span class="n">Topic</span> <span class="n">topic</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTopic</span><span class="o">(</span><span class="n">topicName</span><span class="o">);</span>
+
+            <span class="c1">//创建持久订阅模式的消费者</span>
+            <span class="n">consumer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createDurableSubscriber</span><span class="o">(</span><span class="n">topic</span><span class="o">,</span> <span class="n">subscribeName</span><span class="o">);</span> <span class="c1">//订阅名（类似笔名），与ClientID组合唯一确定一个消费者</span>
+
+            <span class="n">consumer</span><span class="o">.</span><span class="na">setMessageListener</span><span class="o">(</span><span class="k">new</span> <span class="n">MessageListener</span><span class="o">()</span> <span class="o">{</span>
+                <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">TextMessage</span> <span class="n">textMessage</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">message</span><span class="o">;</span>
+                    <span class="k">try</span> <span class="o">{</span>
+                        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">textMessage</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+                    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">});</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="o">}</span>
+        <span class="c1">//不close连接，持续监听</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">JMSException</span> <span class="o">{</span>
+        <span class="n">persistentTest1</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>持久订阅的 Subscriber 创建需要使用 <code>session.createDurableSubscriber()</code>来创建（创建时需指定 <code>Subscription Name</code>），并且需要给它指定一个 <code>ClientID</code>。</p>
+<p>把上述<code>NonPersistentSubscriber.java</code>和<code>PersistentSubscriber.java</code>分别运行下，在 Server 后台能看到已经注册了这两个订阅者：
+<img alt="Subscribers" src="http://langlv.me/images/ActiveMQ5.png"></p>
+<p>运行下<code>TopicPublisher.java</code>发布一条消息，能看到正在监听的<code>NonPersistentSubscriber</code>和<code>PersistentSubscriber</code> 都会打印消息：<code>This is message.</code>。</p>
+<p>然后把上面两个<code>Subscriber</code>都关闭，再次查看 Server 后台：
+<img alt="Subscribers2" src="http://langlv.me/images/ActiveMQ6.png">
+可以发现普通订阅者<code>NonPersistentSubscriber</code>已经不见了，只有一个<code>Active</code>和<code>Network</code>状态都为<code>false</code>的<code>PersistentSubscriber</code>，这是因为非持久订阅者必须保持在线，一旦它跟 Server 失去了连接，那系统就会认为它取消了订阅；而持久化订阅者即使暂时不在线，也会作为已订阅者继续存在于系统当中。</p>
+<p>在<code>Subscriber</code>都离线的状态下，再次运行下<code>TopicPublisher.java</code>发布一条消息（把消息内容改为<code>"This is message2."</code>），运行完毕后分别启动<code>NonPersistentSubscriber</code>和<code>PersistentSubscriber</code>。这时会发现持久订阅者<code>PersistentSubscriber</code>能够打印消息<code>"This is message2."</code>，说明系统为它保留了消息，而作为非持久订阅的<code>NonPersistentSubscriber</code>则没有消息打印。印证了上面关于<em>持久订阅</em>和<em>普通订阅</em>的功能差异。</p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/message-queue.html">Message Queue</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+<a href="https://github.com/Victor-Lv/"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>
