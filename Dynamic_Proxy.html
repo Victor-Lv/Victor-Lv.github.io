@@ -181,7 +181,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 <p>上面就是所谓的<strong>静态代理</strong>模式。</p>
 <hr>
 <h2>动态代理</h2>
-<p>上面还只是一个很简单的任务叠加，使用静态代理模式还没啥问题。但是，随着本工厂的业务的扩展和工人数量的增多，我们生产出了一个打卡器用来监控每个工人的上下班时间，工人们上班前和下班后都要打一次卡（这些剥削工人的资本主义家啊）。</p>
+<p>上面还只是一个很简单的任务叠加，使用静态代理模式还没啥问题。但是，随着本工厂的业务的扩展和工人数量的增多，我们生产出了一个打卡器用来监控每个工人的上下班时间，工人们上班前和下班后都要打一次卡。</p>
 <p>于是，用上面静态代理的方式，我们很容易用同样的方法造出一个“打卡器代理”：
 <em>TimeProxy.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="o">;</span>
@@ -239,8 +239,8 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 
 
 <p>老板发现“打卡器--TimeProxy”这玩意很好用，于是想把它推向市场，适配更多用户，而不仅仅是本工厂的 Man 和 Woman。</p>
-<p>然后问题来了，我们有几百类目标用户，总不能让"TimeProxy" 去 <code>implements</code>这几百类接口吧？</p>
-<p>而动态代理就能解决这个问题，把静态代理动态拓展。下面就来看看动态代理是怎么做到这件事的：</p>
+<p>然后问题来了，我们有几百类目标用户，总不能让"TimeProxy" 去 <code>implements</code>这几百类接口或者写几百个这样的静态代理吧？</p>
+<p>而动态代理就能解决这个问题，把静态代理进行动态的拓展。下面就来看看动态代理是怎么做到这件事的：</p>
 <p><em>DynamicTimeProxy.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.lang.reflect.InvocationHandler</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.lang.reflect.Method</span><span class="o">;</span>
