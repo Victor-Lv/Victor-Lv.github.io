@@ -73,7 +73,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
         <div><p>有动自有静，在看动态代理之前先看更简单明了的“静态代理”。下面以实例描述。</p>
 <!--more-->
 
-<h4>（静态）代理</h4>
+<h2>（静态）代理</h2>
 <p>定义一个 Human 接口：
 <em>Human.java</em></p>
 <div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Human</span> <span class="o">{</span>
@@ -180,7 +180,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 <p>就可以做到更多的事情了。一来解放了自己的双手，同样的工作量；二来，也无须对 Man 和 Woman 进行艰难的“思想改造”了，是不是很棒！</p>
 <p>上面就是所谓的<strong>静态代理</strong>模式。</p>
 <hr>
-<h4>动态代理</h4>
+<h2>动态代理</h2>
 <p>上面还只是一个很简单的任务叠加，使用静态代理模式还没啥问题。但是，随着本工厂的业务的扩展和工人数量的增多，我们生产出了一个打卡器用来监控每个工人的上下班时间，工人们上班前和下班后都要打一次卡（这些剥削工人的资本主义家啊）。</p>
 <p>于是，用上面静态代理的方式，我们很容易用同样的方法造出一个“打卡器代理”：
 <em>TimeProxy.java</em></p>
@@ -323,7 +323,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 <p>关于动态代理的原理，网上很多文章都写的不明不白，自己也翻了 JDK 源码，有点被层层调用绕晕了，并且到了最底层调用的是无法直接追寻源码的 native 方法（native 方法表明它的具体实现用 JDK 底层语言实现的，比如 C 语言）。直到我看到了 IBM developerWorks 的这篇剖析地很棒的文章：<a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a>。</p>
 <p>用一张图就能看的很直白了：
 <em>动态代理类的继承图（转载自<a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a>)</em></p>
-<p><img alt="动态代理类的继承图" src="2"></p>
+<p><img alt="动态代理类的继承图" src="http://langlv.me/images/dynamicProxy_inherit.png"></p>
 <p>解释：ProxyN 继承_extends 了 Proxy（对应上述例子的 DynamicTimeProxy），并且实现_implements 了 InterfaceA/B/X（对应上述例子的 Bird 接口)。</p>
 <p>有了这张图我们就能很好地解释动态代理的原理了。上述动态代理最关键的一处代码是
  <code>DynamicTimeProxy</code>的<code>bind()</code>方法中的<code>Proxy.newProxyInstance</code>。这里干了些什么呢？就是上面继承图描述的，这里它生成了一个对象 ProxyN，这个 ProxyN 继承于 DynamicTimeProxy ，并且实现了 Human 接口（具体实现就是用的 invoke 方法里面的内容），一个 extends 加一个 implements，于是，这个 ProxyN 既拥有 Human 所有的方法，又拥有一个内部属性 target。</p>
