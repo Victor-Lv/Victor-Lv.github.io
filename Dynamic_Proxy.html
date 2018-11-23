@@ -321,8 +321,8 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 
 
 <p>关于动态代理的原理，网上很多文章都写的不明不白，自己也翻了 JDK 源码，有点被层层调用绕晕了，并且到了最底层调用的是无法直接追寻源码的 native 方法（native 方法表明它的具体实现用 JDK 底层语言实现的，比如 C 语言）。直到我看到了 IBM developerWorks 的这篇剖析地很棒的文章：<a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a>。</p>
-<p>用一张图就能看的很直白了：
-<em>动态代理类的继承图（转载自<a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a>)</em></p>
+<p>用一张图就能看的很直白了：  </p>
+<p><em>动态代理类的继承图（转载自<a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a>)</em></p>
 <p><img alt="动态代理类的继承图" src="http://langlv.me/images/dynamicProxy_inherit.png"></p>
 <p>解释：ProxyN 继承_extends 了 Proxy（对应上述例子的 DynamicTimeProxy），并且实现_implements 了 InterfaceA/B/X（对应上述例子的 Bird 接口)。</p>
 <p>有了这张图我们就能很好地解释动态代理的原理了。上述动态代理最关键的一处代码是
