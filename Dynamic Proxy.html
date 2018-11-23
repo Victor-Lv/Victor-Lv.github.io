@@ -70,10 +70,9 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 
         </div>
 	
-        <div><p>&emsp;&emsp;有动自有静，在看动态代理之前先看更简单明了的“静态代理”。下面以实例描述。</p>
+        <div><p>有动自有静，在看动态代理之前先看更简单明了的“静态代理”。下面以实例描述。</p>
 <!--more-->
 
-<hr>
 <h4>（静态）代理</h4>
 <p>定义一个 Human 接口：
 <em>Human.java</em></p>
@@ -119,12 +118,11 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 </pre></div>
 
 
-<p>&emsp;&emsp;然后，如果我们想在人们 goToWork 之前叫他们干点别的必备的事情呢？比如让他们出门 goToWork 之前都把工作服穿上。或者让他们 goToWork 完成之后把工作服脱掉？
+<p>然后，如果我们想在人们 goToWork 之前叫他们干点别的必备的事情呢？比如让他们出门 goToWork 之前都把工作服穿上。或者让他们 goToWork 完成之后把工作服脱掉？
 &emsp;&emsp;把 Man 和 Woman 的实现都修改一遍？No，我们可以用<em>代理</em>来帮我们实现这件事。</p>
-<hr>
-<p>&emsp;&emsp;一开始，当我们（假设我们是有钱的大老板）想驱使 Man 和 Woman 去干活时，我们需要一一去叫他们：“Hey, Man，go to work!”  和 “Hey, Woman, go to work!"，然后，我们觉得他们的穿的衣服太丑了，想叫他们工作之前统一穿上工作服，那我们同样需要给他们分别进行“思想改造”："Hey, Man, dress up before you go to work!"，"Hey, Woman, dress up before you go to work!"。
-&emsp;&emsp;这样传统的方法，有两个问题，第一：作为有钱的大老板，对于这些琐碎而重复的事，当然想节省点口舌；第二：这些底层劳工，要对他们进行“思想改造”，难滴很。</p>
-<p>&emsp;&emsp;于是，机智的老板想到了一个办法：请一个监工（代理），让这个监工自动帮他们穿上和脱下工作服，用代码描述如下：
+<p>一开始，当我们（假设我们是有钱的大老板）想驱使 Man 和 Woman 去干活时，我们需要一一去叫他们：“Hey, Man，go to work!”  和 “Hey, Woman, go to work!"，然后，我们觉得他们的穿的衣服太丑了，想叫他们工作之前统一穿上工作服，那我们同样需要给他们分别进行“思想改造”："Hey, Man, dress up before you go to work!"，"Hey, Woman, dress up before you go to work!"。</p>
+<p>这样传统的方法，有两个问题，第一：作为有钱的大老板，对于这些琐碎而重复的事，当然想节省点口舌；第二：这些底层劳工，要对他们进行“思想改造”，难滴很。</p>
+<p>于是，机智的老板想到了一个办法：请一个监工（代理），让这个监工自动帮他们穿上和脱下工作服，用代码描述如下：
 <em>HumanProxy.java</em></p>
 <div class="highlight"><pre><span></span><span class="cm">/**</span>
 <span class="cm"> * @ClassName: HumanProxy</span>
@@ -183,8 +181,8 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 <p>上面就是所谓的<strong>静态代理</strong>模式。</p>
 <hr>
 <h4>动态代理</h4>
-<p>&emsp;&emsp;上面还只是一个很简单的任务叠加，使用静态代理模式还没啥问题。但是，随着本工厂的业务的扩展和工人数量的增多，我们生产出了一个打卡器用来监控每个工人的上下班时间，工人们上班前和下班后都要打一次卡（这些剥削工人的资本主义家啊）。</p>
-<p>&emsp;&emsp;于是，用上面静态代理的方式，我们很容易用同样的方法造出一个“打卡器代理”：
+<p>上面还只是一个很简单的任务叠加，使用静态代理模式还没啥问题。但是，随着本工厂的业务的扩展和工人数量的增多，我们生产出了一个打卡器用来监控每个工人的上下班时间，工人们上班前和下班后都要打一次卡（这些剥削工人的资本主义家啊）。</p>
+<p>于是，用上面静态代理的方式，我们很容易用同样的方法造出一个“打卡器代理”：
 <em>TimeProxy.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
@@ -240,9 +238,9 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 </pre></div>
 
 
-<p>&emsp;&emsp;老板发现“打卡器--TimeProxy”这玩意很好用，于是想把它推向市场，适配更多用户，而不仅仅是本工厂的 Man 和 Woman。</p>
-<p>&emsp;&emsp;然后问题来了，我们有几百类目标用户，总不能让"TimeProxy" 去 <code>implements</code>这几百类接口吧？</p>
-<p>&emsp;&emsp;而动态代理就能解决这个问题，把静态代理动态拓展。下面就来看看动态代理是怎么做到这件事的：</p>
+<p>老板发现“打卡器--TimeProxy”这玩意很好用，于是想把它推向市场，适配更多用户，而不仅仅是本工厂的 Man 和 Woman。</p>
+<p>然后问题来了，我们有几百类目标用户，总不能让"TimeProxy" 去 <code>implements</code>这几百类接口吧？</p>
+<p>而动态代理就能解决这个问题，把静态代理动态拓展。下面就来看看动态代理是怎么做到这件事的：</p>
 <p><em>DynamicTimeProxy.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">java.lang.reflect.InvocationHandler</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.lang.reflect.Method</span><span class="o">;</span>
@@ -326,15 +324,24 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 <p>用一张图就能看的很直白了：
 <em>动态代理类的继承图（转载自<a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a>)</em></p>
 <p><img alt="动态代理类的继承图" src="2"></p>
-<p>解释：ProxyN 继承_extends 了 Proxy（对应上述例子的 DynamicTimeProxy），并且实现_implements 了 InterfaceA/B/X（对应上述例子的 Bird 接口)。
-有了这张图我们就能很好地解释动态代理的原理了。上述动态代理最关键的一处代码是
- <code>DynamicTimeProxy</code>的<code>bind()</code>方法中的<code>Proxy.newProxyInstance</code>。这里干了些什么呢？就是上面继承图描述的，这里它生成了一个对象 ProxyN，这个 ProxyN 继承于 DynamicTimeProxy ，并且实现了 Human 接口（具体实现就是用的 invoke 方法里面的内容），一个 extends 加一个 implements，于是，这个 ProxyN 既拥有 Human 所有的方法，又拥有一个内部属性 target。
- 1、所以我们也就能理解为什么我们能把 <code>Proxy.newProxyInstance</code>生成出来的对象安全转换成 <code>Human</code>了，因为它 implements 了 Human。
- 2、所以之后对于<code>Proxy.newProxyInstance</code>生成对象 human1/human2 方法的调用，实际上调用的是这个 ProxyN Override出来的方法（假设是 newGoToWork()），而 newGoToWork() 一方面在 goToWork 之前和之后加上了新功能，另一方面它内部调用的 goToWork 实际上又是 ProxyN 内部的  target（Man/Woman）的 goToWork 方法。于是这就能完美解释程序的输出结果了。</p>
+<p>解释：ProxyN 继承_extends 了 Proxy（对应上述例子的 DynamicTimeProxy），并且实现_implements 了 InterfaceA/B/X（对应上述例子的 Bird 接口)。</p>
+<p>有了这张图我们就能很好地解释动态代理的原理了。上述动态代理最关键的一处代码是
+ <code>DynamicTimeProxy</code>的<code>bind()</code>方法中的<code>Proxy.newProxyInstance</code>。这里干了些什么呢？就是上面继承图描述的，这里它生成了一个对象 ProxyN，这个 ProxyN 继承于 DynamicTimeProxy ，并且实现了 Human 接口（具体实现就是用的 invoke 方法里面的内容），一个 extends 加一个 implements，于是，这个 ProxyN 既拥有 Human 所有的方法，又拥有一个内部属性 target。</p>
+<p>1、所以我们也就能理解为什么我们能把 <code>Proxy.newProxyInstance</code>生成出来的对象（ProxyN）安全转换成 <code>Human</code>了，因为它 implements 了 Human。那这个 ProxyN 是不是一个 Man/Woman 呢？测试一下就知道了：
+ ```java
+ DynamicTimeProxy dynamicTimeProxy = new DynamicTimeProxy();
+ Man man = (Man) dynamicTimeProxy.bind(new Man());
+ man.goToWork();</p>
+<p>/<em><em>
+</em> Output(Exception):
+Exception in thread "main" java.lang.ClassCastException: com.sun.proxy.$Proxy0 cannot be cast to Man
+</em>/
+ ```
+ 可以发现 ProxyN 并不能转成 Man，说明它并不是（extends）一个 Man。</p>
+<p>2、所以之后对于<code>Proxy.newProxyInstance</code>生成对象 human1/human2 方法的调用，实际上调用的是这个 ProxyN Override出来的方法（假设是 newGoToWork()），而 newGoToWork() 一方面在 goToWork 之前和之后加上了新功能，另一方面它内部调用的 goToWork 实际上又是 ProxyN 内部的  target（Man/Woman）的 goToWork 方法。于是这就能完美解释程序的输出结果了。</p>
 <p>此外，上述程序中为了证明生成的对象是不一样的（地址），我把他们的内存地址用 <code>System.identityHashCode</code>打印了出来。</p>
-<hr>
-<p>于是乎，有了这个动态代理，工厂老板就可以把它的“打卡器“推向更广阔的市场应用场景了。</p>
-<p>最后，再次推荐看下这篇文章，关于动态代理的原理说的够清楚了：
+<p>于是乎，有了这个动态代理，工厂老板就可以把它的“打卡器“推向更广阔的市场应用场景了。
+最后，再次推荐看下这篇文章，关于动态代理的原理说的够清楚了：
 <a href="https://www.ibm.com/developerworks/cn/java/j-lo-proxy1/">Java 动态代理机制分析及扩展，第 1 部分</a></p></div>
 	
         <br>
