@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 图解Java参数传递</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>图解Java参数传递</h1>
+2018-11-27
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><p>先学过 C/C++ 然后再学 Java 的同学们都会有一个疑问，C/C++里面 的参数传递分为<strong>值传递</strong>、<strong>指针传递</strong>、<strong>引用传递</strong>，Java 中不存在指针，自然不存在<strong>指针传递</strong>，那么 Java 的参数传递是<strong>值传递</strong>还是<strong>引用传递</strong>？抑或是二者都有？</p>
+<p>本文将以程序示例和自拟的流程图来讲解这个问题。</p>
+<!--more-->
+
+<p>程序示例：</p>
+<div class="highlight"><pre><span></span>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">passTest1</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">passTest2</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">ints</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+
+        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="n">passTest1</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+
+        <span class="kt">int</span><span class="o">[]</span> <span class="n">ints</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">};</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>
+        <span class="n">passTest2</span><span class="o">(</span><span class="n">ints</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Output:</span>
+<span class="cm">         1</span>
+<span class="cm">         1</span>
+<span class="cm">         1</span>
+<span class="cm">         0</span>
+<span class="cm">         */</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>可以发现传递基本类型的参数时，并没有函数外面原有变量的值；而如果传的是复杂类型（引用类型），比如数组或者 Object ，那么针对传进来的参数的内容修改，也会反映到函数外原有变量。</p>
+<p>下面用流程图的方式描述下我对于 Java 参数传递的理解：</p>
+<h3>基本类型传参——值传递</h3>
+<p><em>基本类型传参流程图</em></p>
+<p><img alt="基本类型传参" src="http://langlv.me/images/baseTypePass.png"></p>
+<p>对应的程序：</p>
+<div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">passTest3</span><span class="o">(</span><span class="kt">int</span> <span class="n">i1</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="n">i1</span> <span class="o">+</span> <span class="n">i2</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="kt">int</span> <span class="n">i1</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+<span class="kt">int</span> <span class="n">i2</span> <span class="o">=</span> <span class="mi">2</span><span class="o">;</span>
+<span class="n">passTest3</span><span class="o">(</span><span class="n">i1</span><span class="o">,</span> <span class="n">i2</span><span class="o">);</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i1</span><span class="o">);</span>
+<span class="cm">/**</span>
+<span class="cm">Output:</span>
+<span class="cm">1</span>
+<span class="cm">*/</span>
+</pre></div>
+
+
+<p>如图，对于基本类型参数传递，系统会将把<strong>源参数</strong>（实际参数）的<strong>内容</strong>取出来，放进（中间省略了<em>内容</em>传递的中间流程） CPU 缓存区，有内容则必有载体，所以这个过程中间，肯定会在一个新的<strong>内存地址</strong>中存放源参数的内容（形式参数），也就是产生了一份<strong>内容副本</strong>，但是内存地址（假设是<strong>地址B</strong>）已经和源参数（假设是<strong>地址A</strong>）的不一样了。</p>
+<p>然后基于这两个<em>副本</em>的值，CPU对其做加法运算，得出一个新的值作为<em>内容</em>存进了<strong>地址B</strong>中。</p>
+<p>从<strong>内容副本</strong>复制完成之后，就没<strong>源参数（地址A）</strong>什么事了，所以自然也不会修改<strong>源参数（地址A）</strong>里面的值了。</p>
+<h3>复杂类型（引用类型）传参——引用传递</h3>
+<p><em>复杂类型传参流程图</em></p>
+<p><img alt="复杂类型传参" src="http://langlv.me/images/passObj.png"></p>
+<p>对应的程序：</p>
+<div class="highlight"><pre><span></span>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">passTest4</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">ints</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">+</span> <span class="n">i</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kt">int</span><span class="o">[]</span> <span class="n">ints</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">};</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">6</span><span class="o">;</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>
+    <span class="n">passTest4</span><span class="o">(</span><span class="n">ints</span><span class="o">,</span> <span class="n">i</span> <span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">ints</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>
+
+    <span class="cm">/**</span>
+<span class="cm">    * Output:</span>
+<span class="cm">    1</span>
+<span class="cm">    7</span>
+<span class="cm">    */</span>
+</pre></div>
+
+
+<p>如图，对于复杂类型的参数传递，如果这个复杂类型的<em>内容</em>特别大，总不能把这么大的<em>内容</em>都挪出来做一个副本然后放到缓冲区吧？所以很自然地就产生了一个方法，就是：你给我一把钥匙（引用），钥匙上写着门房地址，回头我自己去这个门房地址把我要的东西取出来。</p>
+<p>所以对于复杂类型的参数传递，传递的实际是该参数的引用（存放地址【假设是<strong>地址A</strong>】的变量），传递进来的是引用，那么函数内操作的就是实参的地址/内容了，对这个参数的取值和修改都是直接作用于<strong>地址A</strong>。比如 <code>ints[0]</code>实际是通过引用去到<strong>地址A</strong>所在的堆栈空间中，取出其<strong>子元素</strong>，假设是<strong>地址A1</strong>。在做完加法运算后，又把运算结果存到的<strong>地址A1</strong>中。于是，我们发现，<strong>地址A</strong>里面的内容已经变了（因为它里面的<strong>子地址A1的内容</strong>变了）。</p>
+<p>所以，在复杂类型的参数传递中，有一个风险就是，我把钥匙和门房地址都给你了，那我房间的东西岂不是任你使用，并且也任你“糟蹋”（修改）？所以我们可以通过<strong>final</strong>关键字，告诉系统：你可以看但不能动我房间里面的东西，此所谓“可远观而不可亵玩焉”。</p>
+<p>更深入的讲解可以看看这篇参考资料：</p>
+<p><em>参考资料</em>
+<a href="https://www.zhihu.com/question/31203609/answer/50992895">Java 到底是值传递还是引用传递？知乎 Intopass 的回答</a></p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/java.html">Java</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+<a href="https://github.com/Victor-Lv/"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>
