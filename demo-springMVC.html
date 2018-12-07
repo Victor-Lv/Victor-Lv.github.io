@@ -101,7 +101,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 
 <!--more-->
 
-<p>Here,  <code>web.xml</code> configure the important element <strong>DispatcherServlet</strong> and map it into <em>/</em> url ( website root url ). If external context configuration is needed, we can specify external configuration in this way:</p>
+<p>Here,  <code>web.xml</code> configure the important element <strong>DispatcherServlet</strong> and map it into <em>/</em> url ( website root url ). If external context configuration is needed, we can define external configuration in this way:</p>
 <div class="highlight"><pre><span></span><span class="c">&lt;!-- Specify the external context configuration file --&gt;</span>
     <span class="nt">&lt;context-param&gt;</span>
         <span class="nt">&lt;param-name&gt;</span>contextConfigLocation<span class="nt">&lt;/param-name&gt;</span>
@@ -116,7 +116,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 
 
 <h4>2. servlet.xml</h4>
-<p>In <code>web.xml</code>, we specify a servlet who's name is <code>app</code>. This will tell the program to search a xml configuration who's name is <code>app-servlet.xml</code>. So, we need to create <code>app-servlet.xml</code>:
+<p>In <code>web.xml</code>, we define a servlet who's name is <code>app</code>. This will tell the program to search a xml configuration who's name is <code>app-servlet.xml</code>. So, we need to create <code>app-servlet.xml</code>:
 <em>app-servlet.xml</em></p>
 <div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span>
 <span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.springframework.org/schema/beans&quot;</span>
@@ -146,7 +146,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 </pre></div>
 
 
-<p>In this file, we enable the Spring-MVC driven by annotion. And we tell the program to search the component bean in package <code>test.control</code> and then load the beans into context. Also, we inject a ViewResolver bean used to render JSP views.</p>
+<p>In this file, we enable the Spring-MVC driven by annotation. And we tell the program to search the component bean in package <code>test.control</code> and then load the beans into context. Also, we inject a ViewResolver bean used to render JSP views.</p>
 <h3>3. Controller and View</h3>
 <p>Ok, configure is finished. Let's begin write MVC (model - view - control) code. First, we complete the controllers. All websites need an index page, generally be index view. IndexController is showed as follow:
 <em>IndexController.java</em></p>
