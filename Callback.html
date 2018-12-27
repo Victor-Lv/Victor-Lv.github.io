@@ -70,7 +70,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 
         </div>
 	
-        <div><h3>浅析Java回调机制</h3>
+        <div><h2>浅析Java回调机制</h2>
 <p>&emsp;&emsp;生活中，我们经常碰到这样的例子：当我们想完成某个工作时
 ，期间会有一个非常耗时的子任务，但我们又不想干等待它的完成才继续工作，
 于是我们希望把这个子任务交付出去给别人完成，
@@ -91,7 +91,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 因为这些事情必须在这个 I/O 操作完成后才能执行。于是，就产生了<strong>异步回调</strong>。</p>
 <p>&emsp;&emsp;下面结合程序示例来讲一讲<strong>（异步）回调</strong>。在讲异步回调之前，
 先来看两个更简单些的概念：<strong>“同步调用”、“异步调用”、“同步回调”</strong>。</p>
-<h4>同步调用</h4>
+<h3>同步调用</h3>
 <p>程序示例：</p>
 <p><em>A.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
@@ -207,7 +207,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 </pre></div>
 
 
-<h4>异步调用</h4>
+<h3>异步调用</h3>
 <p>&emsp;&emsp;注意上面的同步调用中，老板A必须等待秘书B处理完之后才能继续往下工作，
 因为大家是在同一个线程，顺序执行的，
 这就导致了老板A在秘书B寄信期间不能干活。
@@ -262,7 +262,7 @@ B takes long long time to do something
 
 <p>&emsp;&emsp;通过输出，我们知道，在把寄信的任务托付给了秘书B之后，老板A马上就继续工作了，
 而过了一段时间B才完成了寄信的工作。</p>
-<h4>同步回调</h4>
+<h3>同步回调</h3>
 <p>&emsp;&emsp;顾名思义，同步回调相比同步调用增加了一个回调机制，来看看程序怎么实现的：</p>
 <p><em>A.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
@@ -364,7 +364,7 @@ End work
 在B做完事回来之前，他都可以躺在椅子上休息（CPU空闲），
 等到B把煎饼买回来并给到他之后，他吃完又有力气可以继续干活了（continueWorking)。</p>
 <p>&emsp;&emsp;这就是一个同步回调。</p>
-<h4>异步回调</h4>
+<h3>异步回调</h3>
 <p>&emsp;&emsp;上面同步回调的例子中，老板A在秘书B把煎饼买回来之前是没法继续干活的，
 因为他实在太饿了。但是哪一天老板A没那么饿呢，他想在秘书B买煎饼期间又继续干活去，
 那怎么办，这就是<strong>异步回调</strong>的用武之地了。</p>
@@ -437,8 +437,8 @@ Continue to work
 <p>&emsp;&emsp;可以看到，因为我们启用了一个新的线程让 B 去 handle，
 所以不影响 A 继续干别的活，比如老板 A 想跳支舞自嗨下（take a dance）？哈哈。 </p>
 <p><em>参考文章：</em>
-[Java回调机制解读-博客园][https://www.cnblogs.com/xrq730/p/6424471.html]
-[Java 中回调机制是什么原理？-知乎][https://www.zhihu.com/question/25504849]</p></div>
+<a href="https://www.cnblogs.com/xrq730/p/6424471.html">Java回调机制解读-博客园</a>
+<a href="https://www.zhihu.com/question/25504849">Java 中回调机制是什么原理？-知乎</a></p></div>
 	
         <br>
 
