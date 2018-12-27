@@ -90,7 +90,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 那就是当这个 I/O 操作完成后，我希望它能告诉我，好让我继续去做某些事情，
 因为这些事情必须在这个 I/O 操作完成后才能执行。于是，就产生了<strong>异步回调</strong>。</p>
 <p>&emsp;&emsp;下面结合程序示例来讲一讲<strong>（异步）回调</strong>。在讲异步回调之前，
-先来看两个更简单些的概念：<strong>“同步调用”、“异步调用”、“同步回调”</strong>。</p>
+先来看几个更简单些的概念：<strong>“同步调用”、“异步调用”、“同步回调”</strong>。</p>
 <h3>同步调用</h3>
 <p>程序示例：</p>
 <p><em>A.java</em></p>
@@ -365,10 +365,10 @@ End work
 等到B把煎饼买回来并给到他之后，他吃完又有力气可以继续干活了（continueWorking)。</p>
 <p>&emsp;&emsp;这就是一个同步回调。</p>
 <h3>异步回调</h3>
+<p>&emsp;&emsp;介绍完上面三个概念之后，很自然地就可以引出我们今天的主角：<strong>异步回调</strong>。  </p>
 <p>&emsp;&emsp;上面同步回调的例子中，老板A在秘书B把煎饼买回来之前是没法继续干活的，
 因为他实在太饿了。但是哪一天老板A没那么饿呢，他想在秘书B买煎饼期间又继续干活去，
 那怎么办，这就是<strong>异步回调</strong>的用武之地了。</p>
-<p>&emsp;&emsp;介绍完上面三个概念之后，很自然地就可以引出我们今天的主角：<strong>异步回调</strong>。</p>
 <p>&emsp;&emsp;异步回调无非就是在上面的同步回调的基础上增加异步调用嘛。来看程序示例：</p>
 <p><em>A.java</em></p>
 <div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
@@ -435,7 +435,7 @@ Continue to work
 
 
 <p>&emsp;&emsp;可以看到，因为我们启用了一个新的线程让 B 去 handle，
-所以不影响 A 继续干别的活，比如老板 A 想跳支舞自嗨下（take a dance）？Who knows. 哈哈。 </p>
+所以不影响 A 继续干别的活，比如老板 A 想跳支舞自嗨下（take a dance）。</p>
 <p><em>参考文章：</em>  </p>
 <p><a href="https://www.cnblogs.com/xrq730/p/6424471.html">Java回调机制解读-博客园</a>  </p>
 <p><a href="https://www.zhihu.com/question/25504849">Java 中回调机制是什么原理？-知乎</a></p></div>
