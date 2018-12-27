@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 浅析Java回调机制</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>浅析Java回调机制</h1>
+2018-12-27
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><p>期间会有一个非常耗时的子任务，但我们又不想干等待它的完成才继续工作，
+于是我们希望把这个子任务交付出去给别人完成，
+然后我们就可以继续往下做其他事情了，
+等别人完成工作的时候，又会自动回来我这告诉我完成情况。</p>
+<h3>浅析Java回调机制</h3>
+<p>&emsp;&emsp;生活中，我们经常碰到这样的例子：当我们想完成某个工作时
+，期间会有一个非常耗时的子任务，但我们又不想干等待它的完成才继续工作，
+于是我们希望把这个子任务交付出去给别人完成，
+然后我们就可以继续往下做其他事情了，
+等别人完成工作的时候，又会自动回来我这告诉我完成情况。</p>
+<p>&emsp;&emsp;好比如你住酒店，你在打扫房间的时候，
+有一堆衣服要洗，但洗衣服这事太耗时了，
+所以你把清洁阿姨叫过来让她帮你拿衣服去洗，
+并告诉她衣服洗完后帮我放回A201房间的柜子里，
+托付完毕，你可以继续干手头的打扫工作了。</p>
+<p>&emsp;&emsp;基于这样的思想，应用于编程中，那就衍生了回调。
+在应用系统中，我们经常碰到很耗时的 I/O 子任务（包括磁盘I/O、网络I/O），
+如果我们完全照顺序执行的，那不得不等待这个 I/O 操作完成了我们才能继续往下执行程序，
+那在这段 I/O 时间内 CPU 是被极度闲置的。
+于是，我们很自然地想到了<strong>异步</strong>，另起一个线程做那个 I/O 操作不就行了么？
+但是，我们又增加了一个需求，
+那就是当这个 I/O 操作完成后，我希望它能告诉我，好让我继续去做某些事情，
+因为这些事情必须在这个 I/O 操作完成后才能执行。于是，就产生了<strong>异步回调</strong>。</p>
+<p>&emsp;&emsp;下面结合程序示例来讲一讲<strong>（异步）回调</strong>。在讲异步回调之前，
+先来看两个更简单些的概念：<strong>“同步调用”、“异步调用”、“同步回调”</strong>。</p>
+<h4>同步调用</h4>
+<p>程序示例：</p>
+<p><em>A.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: A</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="n">InterfaceA</span><span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">InterfaceB</span> <span class="n">b</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">A</span><span class="o">(</span><span class="n">InterfaceB</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">work</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Begin work&quot;</span><span class="o">);</span>
+        <span class="c1">//call b to help me do something</span>
+        <span class="n">b</span><span class="o">.</span><span class="na">handle</span><span class="o">();</span>
+        <span class="n">continueWorking</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">continueWorking</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Continue to work&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>B.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: B</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">B</span> <span class="kd">implements</span> <span class="n">InterfaceB</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//do something</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;B takes long long time to do something&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">3000</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;这是一个很简单的示例，作用类似于：老板A在办公室干活（work），
+他有一封信要寄出去，但他不想自己跑腿，然后他交代他的秘书B去处理（handle），
+等B处理完之后他就继续工作了（continueWorking)。</p>
+<p>&emsp;&emsp;这就是一个同步调用。</p>
+<p>&emsp;&emsp;顺便，我们丰富了下功能，就是把老板A和秘书B接口化（面向接口编程），
+这样的话，秘书B即便换了人，老板还是同样的差使动作；
+反之，即便老板换了又换，秘书B也能干相同的差事。</p>
+<p><em>InterfaceA.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">InterfaceA</span> <span class="o">{</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>InterfaceB.java**</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">InterfaceB</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;测试一下输出：</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: CallbackTest</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CallbackTest</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">B</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">B</span><span class="o">();</span>
+        <span class="n">A</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">A</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
+        <span class="n">a</span><span class="o">.</span><span class="na">work</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**</span>
+<span class="cm">     * Output:</span>
+<span class="cm">        Begin work</span>
+<span class="cm">        B takes long long time to do something</span>
+<span class="cm">        Continue to work</span>
+<span class="cm">     */</span>
+
+<span class="o">}</span>
+</pre></div>
+
+
+<h4>异步调用</h4>
+<p>&emsp;&emsp;注意上面的同步调用中，老板A必须等待秘书B处理完之后才能继续往下工作，
+因为大家是在同一个线程，顺序执行的，
+这就导致了老板A在秘书B寄信期间不能干活。
+但是寄信这事老板并不是老板继续往下工作的必要前提，所以我们可以采用<strong>异步调用</strong>的方式处理。</p>
+<p>&emsp;&emsp;异步调用相比同步调用，增加一个多线程处理即可：</p>
+<p>&emsp;&emsp;只需要改下 <em>A.java</em> 即可:</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: A</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="n">InterfaceA</span><span class="o">,</span> <span class="n">Runnable</span><span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">InterfaceB</span> <span class="n">b</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">A</span><span class="o">(</span><span class="n">InterfaceB</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">work</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Begin work&quot;</span><span class="o">);</span>
+
+        <span class="c1">//start another thread to handle</span>
+        <span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">start</span><span class="o">();</span>
+
+        <span class="n">continueWorking</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">continueWorking</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Continue to work&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//call b to help me do something</span>
+        <span class="n">b</span><span class="o">.</span><span class="na">handle</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>测试输出：</p>
+<div class="highlight"><pre><span></span>Begin work
+Continue to work
+B takes long long time to do something
+</pre></div>
+
+
+<p>&emsp;&emsp;通过输出，我们知道，在把寄信的任务托付给了秘书B之后，老板A马上就继续工作了，
+而过了一段时间B才完成了寄信的工作。</p>
+<h4>同步回调</h4>
+<p>&emsp;&emsp;顾名思义，同步回调相比同步调用增加了一个回调机制，来看看程序怎么实现的：</p>
+<p><em>A.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: A</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="n">InterfaceA</span><span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">InterfaceB</span> <span class="n">b</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">A</span><span class="o">(</span><span class="n">InterfaceB</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">work</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Begin work&quot;</span><span class="o">);</span>
+
+        <span class="c1">//call b to help me do something</span>
+        <span class="n">b</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;End work&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">continueWorking</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Continue to work&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">callback</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;B callback&quot;</span><span class="o">);</span>
+        <span class="n">continueWorking</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>B.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: B</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">B</span> <span class="kd">implements</span> <span class="n">InterfaceB</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">(</span><span class="n">InterfaceA</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//do something</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;B takes long long time to do something&quot;</span><span class="o">);</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">3000</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+        <span class="o">}</span>
+        <span class="n">a</span><span class="o">.</span><span class="na">callback</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>InterfaceA.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">InterfaceA</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">callback</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>InterfaceB</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">InterfaceB</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handle</span><span class="o">(</span><span class="n">InterfaceA</span> <span class="n">a</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>测试输出</em></p>
+<div class="highlight"><pre><span></span>Begin work
+B takes long long time to do something
+B callback
+Continue to work
+End work
+</pre></div>
+
+
+<p>&emsp;&emsp;这个示例，作用类似于：老板A在办公室干活（work），
+这时他感觉饿了，想吃楼下的山东煎饼，但他不想自己跑腿，
+然后他交代他的秘书B去处理（handle），并告诉B处理完之后敲下我的门通知我（callback），
+在B做完事回来之前，他都可以躺在椅子上休息（CPU空闲），
+等到B把煎饼买回来并给到他之后，他吃完又有力气可以继续干活了（continueWorking)。</p>
+<p>&emsp;&emsp;这就是一个同步回调。</p>
+<h4>异步回调</h4>
+<p>&emsp;&emsp;上面同步回调的例子中，老板A在秘书B把煎饼买回来之前是没法继续干活的，
+因为他实在太饿了。但是哪一天老板A没那么饿呢，他想在秘书B买煎饼期间又继续干活去，
+那怎么办，这就是<strong>异步回调</strong>的用武之地了。</p>
+<p>&emsp;&emsp;介绍完上面三个概念之后，很自然地就可以引出我们今天的主角：<strong>异步回调</strong>。</p>
+<p>&emsp;&emsp;异步回调无非就是在上面的同步回调的基础上增加异步调用嘛。来看程序示例：</p>
+<p><em>A.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @ClassName: A</span>
+<span class="cm"> * @Description: TODO</span>
+<span class="cm"> * @Author: Victor Lv (http://langlv.me)</span>
+<span class="cm"> * @Date: 2018/12/27 9:27</span>
+<span class="cm"> * @Version: 1.0</span>
+<span class="cm"> */</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">A</span> <span class="kd">implements</span> <span class="n">InterfaceA</span><span class="o">,</span> <span class="n">Runnable</span><span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">InterfaceB</span> <span class="n">b</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">A</span><span class="o">(</span><span class="n">InterfaceB</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">work</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Begin work&quot;</span><span class="o">);</span>
+
+        <span class="c1">//start another thread to handle</span>
+        <span class="k">new</span> <span class="n">Thread</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">start</span><span class="o">();</span>
+
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Let&#39;s take a dance&quot;</span><span class="o">);</span>
+
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">continueWorking</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Continue to work&quot;</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">callback</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;B callback&quot;</span><span class="o">);</span>
+        <span class="n">continueWorking</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//call b to help me do something</span>
+        <span class="n">b</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="k">this</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>InterfaceA.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nn">callback</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">InterfaceA</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">callback</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><em>测试输出</em></p>
+<div class="highlight"><pre><span></span>Begin work
+Let&#39;s take a dance
+B takes long long time to do something
+B callback
+Continue to work
+</pre></div>
+
+
+<p>&emsp;&emsp;可以看到，因为我们启用了一个新的线程让 B 去 handle，
+所以不影响 A 继续干别的活，比如老板 A 想跳支舞自嗨下（take a dance）？哈哈。 </p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/callback.html">Callback</a> <a href="http://langlv.me/tag/she-ji-mo-shi.html">设计模式</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2018<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+<a href="https://github.com/Victor-Lv/"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>
