@@ -362,7 +362,32 @@ End work
 这时他感觉饿了，想吃楼下的山东煎饼，但他不想自己跑腿，
 然后他交代他的秘书B去处理（handle），并告诉B处理完之后敲下我的门通知我（callback），
 在B做完事回来之前，他都可以躺在椅子上休息（CPU空闲），
-等到B把煎饼买回来并给到他之后，他吃完又有力气可以继续干活了（continueWorking)。</p>
+等到B把煎饼买回来并给到他之后，他吃完又有力气可以继续干活了（continueWorking)。
+同步回调和同步调用一样，所有动作都是按顺序执行的，
+也就是类似如下的程序执行：</p>
+<div class="highlight"><pre><span></span><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Begin work&quot;</span><span class="o">);</span>
+
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;B takes long long time to do something&quot;</span><span class="o">);</span>
+<span class="k">try</span> <span class="o">{</span>
+    <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">3000</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Continue to work&quot;</span><span class="o">);</span>
+</pre></div>
+
+
+<p>&emsp;&emsp;在程序中，在调用 B 进行 handle 的时候，A 需要把 <strong>this</strong> 也就是自身对象的引用传给B，
+这就相当于我们住酒店时把房门钥匙给了清洁阿姨，
+然后阿姨洗完衣服后通过房门钥匙开了门并把洗完的衣服放回桌上。
+问题来了，房门钥匙都给了别人，那岂不是有被盗风险？
+B 通过<strong>this</strong>不就可以随意调用 A 对象的 public 方法了吗？
+别担心，A 和 B 都尽在程序设计者的掌控当中。因为，请注意，
+B 是通过接口 InterfaceA 的方式来操作<strong>this</strong>调用回调函数的，
+也就是说只有我们在 InterfaceA 定义的方法，B 才有权访问，
+看看我们在 InterfaceA 定义了哪些方法？对的，只有 callback 这一种方法，
+也就是说我们赋予清洁阿姨的权限只有把衣服放回桌上这一操作。 </p>
 <p>&emsp;&emsp;这就是一个同步回调。</p>
 <h3>异步回调</h3>
 <p>&emsp;&emsp;介绍完上面三个概念之后，很自然地就可以引出我们今天的主角：<strong>异步回调</strong>。  </p>
