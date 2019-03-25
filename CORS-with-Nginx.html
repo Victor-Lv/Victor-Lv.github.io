@@ -90,7 +90,7 @@ by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
 <ol>
 <li>首先下载 Nginx ，有 windows 版也有 linux 版（下面的配置都通用），我在 linux 服务器上常挂一个 Nginx 服务，这样前端请求的后端地址，直接写成 Nginx 的服务地址即可。</li>
 <li>在 Nginx.conf 上添加反向代理配置，指向后端服务地址：
-在 server-location 中添加一项配置即可：<code>proxy_pass  http://172.21.36.252:41100/;</code></li>
+在 server-location 中添加一项配置即可：<code>proxy_pass  http://172.17.1.1:10000/;</code></li>
 <li>添加 CORS 配置，参考如下：</li>
 </ol>
 <div class="highlight"><pre><span></span>#CORS 配置
