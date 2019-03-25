@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 使用nginx配置CORS-跨域请求访问</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>使用nginx配置CORS-跨域请求访问</h1>
+2019-03-23
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><h2>使用nginx配置CORS-跨域请求访问</h2>
+<h3>CORS 定义</h3>
+<p>前后端分离的web系统，存在 CORS--跨域（协议 / 域名 / 端口）请求访问的问题。</p>
+<p>关于 CORS 的定义，参考网上的帖子：</p>
+<p>“出于安全原因，浏览器限制从脚本内发起的跨源HTTP请求。 例如，XMLHttpRequest和Fetch API遵循同源策略。 这意味着使用这些API的Web应用程序只能从加载应用程序的同一个域请求HTTP资源，除非响应报文包含了正确CORS响应头。”</p>
+<p>这里以我使用的架构作例子：
+前端：使用 Vue.js ，通过 nodeJS 部署，假设地址为 http://172.17.1.1:8080；
+后端：使用SpringMVC，部署在 web 容器上，假设地址为 http://172.17.2.2:10000</p>
+<p>前端通过浏览器向后端发送 http 请求时，请求能被后端接收，但返回给浏览器时，浏览器判断出应答的域（172.17.2.2:10000）与当前的域不一致，会拒绝，页面报404错误。</p>
+<h3>解决方案</h3>
+<p>解决办法就是给应答的 http 报文添加 CORS 请求头（诸如 Access-Control-Allow-Origin 等配置）。</p>
+<p>而添加 http 应答 CORS 头这个动作，可以选用多种方式。比如：
+方式1：后端（SpringMVC）添加 CORS 配置；
+方式2：浏览器安装 postman 插件自动修改（篡改）http 应答，添加 CORS 头信息；
+方式2：使用 Nginx / Apache 服务器作为代理，添加 CORS 头信息，其实 postman 也相当于代理。</p>
+<p>针对我个人的实际情况，因为系统上线生产实际要讲前端编译好的静态文件部署到后端工程中（也就是不分离），只在开发阶段为了提升效率采用前后端分离，那么方式1在后端添加的代码对于生产应用来说就是无用代码，多少存在些隐患，所以方式1不适用于我。方式2，每个开发者都得安装这个浏览器插件，麻烦。于是，我采用了 Nginx 服务器作为反向代理的方式。</p>
+<h3>使用 Nginx 搭建反向代理，配置 CORS</h3>
+<ol>
+<li>首先下载 Nginx ，有 windows 版也有 linux 版（下面的配置都通用），我在 linux 服务器上常挂一个 Nginx 服务，这样前端请求的后端地址，直接写成 Nginx 的服务地址即可。</li>
+<li>在 Nginx.conf 上添加反向代理配置，指向后端服务地址：
+在 server-location 中添加一项配置即可：<code>proxy_pass  http://172.21.36.252:41100/;</code></li>
+<li>添加 CORS 配置，参考如下：</li>
+</ol>
+<div class="highlight"><pre><span></span>#CORS 配置
+add_header &#39;Access-Control-Allow-Origin&#39; &#39;*&#39;;
+add_header &#39;Access-Control-Allow-Methods&#39; &#39;GET, POST, OPTIONS, PUT, DELETE&#39;;
+#是否允许cookie传输
+add_header &#39;Access-Control-Allow-Credentials&#39; &#39;true&#39;;
+add_header &#39;Access-Control-Allow-Headers&#39; &#39;Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Data-Type,X-Requested-With,X-Data-Type,X-Auth-Token&#39;;
+
+ #针对浏览器的options预请求直接返回200，否则会被403 forbidden--invalie CORS request
+if ( $request_method = &#39;OPTIONS&#39; ) { 
+        return 200;
+} 
+</pre></div>
+
+
+<p>逐个配置项解析下：
+（1）<code>Access-Control-Allow-Origin</code>配置的是允许的 origin 地址，<code>*</code> 表示通配，所有源地址都接收，也可以采用粒度更细的控制，输入具体的几个 <code>http:ip:port</code> 地址。
+（2）<code>Access-Control-Allow-Methods</code> 表示允许的 http 动词，也可以通配。
+（3）<code>Access-Control-Allow-Credentials</code>（ true / false ）表示是否允许 cookie 传输。
+（4）<code>Access-Control-Allow-Headers</code>响应首部 Access-Control-Allow-Headers 用于 preflight request （预检请求）中，列出了将会在正式请求的 Access-Control-Expose-Headers 字段中出现的首部信息。如 simple headers、Accept、Accept-Language、Content-Language、<strong>Content-Type </strong>。这里比较常用的是 Content-Type 信息，其值比如有最常见的 post 提交数据的方式，浏览器原生的 form 表单：<code>application/x-www-form-urlencoded</code>；比如越来越流行的<code>application/json</code> 。
+（5）在我的项目中，有了以上四个配置项还不够，因为对于 post 请求，浏览器会首先发一个 <strong>options</strong>请求，向服务端询问并协商好诸如<code>content-type</code>等一些参数，然后才是发真正的 post 请求。而我的 SpringMVC 并不能映射这个 options 请求，导致请求出错（F12 观察到报错：403 forbidden--invalie CORS request）。经过一番研究，在 Nginx 上加入针对 <code>OPTIONS</code>的特殊配置即可解决，也就是如上的配置，判断如果<code>request_method</code>是<code>OPTIONS</code>的话，直接返回 <code>http-200（成功）</code>，不需要再转发给 web 容器处理，这样 SpringMVC 接收到的就只有真正的 post 请求了。</p>
+<p>综上，得出 nginx.conf 全文配置如下：  </p>
+<p><em>nginx.conf</em></p>
+<div class="highlight"><pre><span></span><span class="p">#</span><span class="nn">user</span>  <span class="nt">nobody</span><span class="o">;</span>
+<span class="nt">worker_processes</span>  <span class="nt">1</span><span class="o">;</span>
+
+<span class="p">#</span><span class="nn">error_log</span>  <span class="nt">logs</span><span class="o">/</span><span class="nt">error</span><span class="p">.</span><span class="nc">log</span><span class="o">;</span>
+<span class="p">#</span><span class="nn">error_log</span>  <span class="nt">logs</span><span class="o">/</span><span class="nt">error</span><span class="p">.</span><span class="nc">log</span>  <span class="nt">notice</span><span class="o">;</span>
+<span class="nt">error_log</span>  <span class="nt">logs</span><span class="o">/</span><span class="nt">error</span><span class="p">.</span><span class="nc">log</span>  <span class="nt">info</span><span class="o">;</span>
+
+<span class="nt">pid</span>        <span class="nt">logs</span><span class="o">/</span><span class="nt">nginx</span><span class="p">.</span><span class="nc">pid</span><span class="o">;</span>
+
+
+<span class="nt">events</span> <span class="p">{</span>
+    <span class="err">worker_connections</span>  <span class="err">1024</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="nt">http</span> <span class="p">{</span>
+    <span class="err">include</span>       <span class="err">mime.types</span><span class="p">;</span>
+    <span class="err">default_type</span>  <span class="err">application/octet-stream</span><span class="p">;</span>
+
+    <span class="err">log_format</span>  <span class="err">main</span>  <span class="err">&#39;$remote_addr</span> <span class="err">-</span> <span class="err">$remote_user</span> <span class="cp">[</span><span class="nv">$time_local</span><span class="cp">]</span> <span class="err">&quot;$request&quot;</span> <span class="err">&#39;</span>
+                      <span class="err">&#39;$status</span> <span class="err">$body_bytes_sent</span> <span class="err">&quot;$http_referer&quot;</span> <span class="err">&#39;</span>
+                      <span class="err">&#39;&quot;$http_user_agent&quot;</span> <span class="err">&quot;$http_x_forwarded_for&quot;&#39;</span><span class="p">;</span>
+
+    <span class="err">access_log</span>  <span class="err">logs/access.log</span>  <span class="err">main</span><span class="p">;</span>
+
+    <span class="err">sendfile</span>        <span class="err">on</span><span class="p">;</span>
+    <span class="err">#tcp_nopush</span>     <span class="err">on</span><span class="p">;</span>
+
+    <span class="err">#keepalive_timeout</span>  <span class="err">0</span><span class="p">;</span>
+    <span class="err">keepalive_timeout</span>  <span class="err">65</span><span class="p">;</span>
+
+    <span class="err">#gzip</span>  <span class="err">on</span><span class="p">;</span>
+
+    <span class="err">server</span> <span class="err">{</span>
+        <span class="err">listen</span>       <span class="err">1234</span><span class="p">;</span>
+        <span class="err">server_name</span>  <span class="err">localhost</span><span class="p">;</span>
+
+        <span class="err">#charset</span> <span class="err">koi8-r</span><span class="p">;</span>
+
+        <span class="err">access_log</span>  <span class="err">logs/host.access.log</span>  <span class="err">main</span><span class="p">;</span>
+
+        <span class="err">#反向代理</span>
+        <span class="err">location</span> <span class="err">/</span> <span class="err">{</span>
+            <span class="err">proxy_pass</span>  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">172.17.1.1</span><span class="o">:</span><span class="mi">10000</span><span class="o">/</span><span class="p">;</span>
+
+            <span class="err">#CORS</span> <span class="err">配置</span>
+            <span class="err">add_header</span> <span class="err">&#39;Access-Control-Allow-Origin&#39;</span> <span class="err">&#39;*&#39;</span><span class="p">;</span>
+            <span class="err">add_header</span> <span class="err">&#39;Access-Control-Allow-Methods&#39;</span> <span class="err">&#39;GET,</span> <span class="err">POST,</span> <span class="err">OPTIONS,</span> <span class="err">PUT,</span> <span class="err">DELETE&#39;</span><span class="p">;</span>
+            <span class="err">#是否允许cookie传输</span>
+            <span class="err">add_header</span> <span class="err">&#39;Access-Control-Allow-Credentials&#39;</span> <span class="err">&#39;true&#39;</span><span class="p">;</span>
+            <span class="err">add_header</span> <span class="err">&#39;Access-Control-Allow-Headers&#39;</span> <span class="err">&#39;Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Data-Type,X-Requested-With,X-Data-Type,X-Auth-Token&#39;</span><span class="p">;</span>
+
+            <span class="err">#针对浏览器的options预请求直接返回200，否则会被403</span> <span class="err">forbidden--invalie</span> <span class="err">CORS</span> <span class="err">request</span>
+            <span class="err">if</span> <span class="err">(</span> <span class="err">$request_method</span> <span class="err">=</span> <span class="err">&#39;OPTIONS&#39;</span> <span class="err">)</span> <span class="err">{</span> 
+                                <span class="err">return</span> <span class="err">200</span><span class="p">;</span>
+                        <span class="p">}</span> 
+        <span class="err">}</span>
+
+        <span class="p">#</span><span class="nn">error_page</span>  <span class="nt">404</span>              <span class="o">/</span><span class="nt">404</span><span class="p">.</span><span class="nc">html</span><span class="o">;</span>
+
+        <span class="err">#</span> <span class="nt">redirect</span> <span class="nt">server</span> <span class="nt">error</span> <span class="nt">pages</span> <span class="nt">to</span> <span class="nt">the</span> <span class="nt">static</span> <span class="nt">page</span> <span class="o">/</span><span class="nt">50x</span><span class="p">.</span><span class="nc">html</span>
+        <span class="err">#</span>
+        <span class="nt">error_page</span>   <span class="nt">500</span> <span class="nt">502</span> <span class="nt">503</span> <span class="nt">504</span>  <span class="o">/</span><span class="nt">50x</span><span class="p">.</span><span class="nc">html</span><span class="o">;</span>
+        <span class="nt">location</span> <span class="o">=</span> <span class="o">/</span><span class="nt">50x</span><span class="p">.</span><span class="nc">html</span> <span class="p">{</span>
+            <span class="err">root</span>   <span class="err">html</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="err">}</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<h3>Nginx 配置生效</h3>
+<p>如果在 Nginx 启动时修改 Nginx.conf ，并不需要先关闭 Nginx 修改配置后再打开，只需要执行以下两句命令把配置生效一下即可：</p>
+<div class="highlight"><pre><span></span>nginx -t
+nginx -s reload
+</pre></div>
+
+
+<p>nginx -t 是重读 conf 配置， nginx -s reaload 是将配置重新载入运行区。</p>
+<h3>另附 SpringMVC 中加入的 CORS 配置</h3>
+<p>只需要在 scan 的 package 中加入以下配置类即可（采用Spring-WebMVC 5.1.3 版本编写）：
+<em>CORSConfig.java</em></p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.servlet.config.annotation.CorsRegistry</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.servlet.config.annotation.WebMvcConfigurer</span><span class="o">;</span>
+
+<span class="kn">import static</span> <span class="nn">org.springframework.web.cors.CorsConfiguration.ALL</span><span class="o">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * CORS configuration</span>
+<span class="cm"> * 用于开放跨域资源共享,</span>
+<span class="cm"> * 解决 No Acces-Control-Allow-Origin 的报错</span>
+<span class="cm"> */</span>
+<span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CORSConfig</span> <span class="kd">implements</span> <span class="n">WebMvcConfigurer</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addCorsMappings</span><span class="o">(</span><span class="n">CorsRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">registry</span><span class="o">.</span><span class="na">addMapping</span><span class="o">(</span><span class="s">&quot;/**&quot;</span><span class="o">)</span>
+<span class="c1">//                .allowedOrigins(&quot;http://127.0.0.1:8080&quot;)</span>
+                <span class="c1">//TODO 需要进一步细化权限颗粒度</span>
+                <span class="o">.</span><span class="na">allowedOrigins</span><span class="o">(</span><span class="n">ALL</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">allowedMethods</span><span class="o">(</span><span class="n">ALL</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">allowedHeaders</span><span class="o">(</span><span class="n">ALL</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">allowCredentials</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/cors.html">CORS</a> <a href="http://langlv.me/tag/nginx.html">Nginx</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2019<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+<a href="https://github.com/Victor-Lv/"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>
