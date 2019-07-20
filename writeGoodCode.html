@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="chinese (simplified)">
+<head>
+    <meta charset="utf-8">
+    <title>Victor Lv's Blog - 引申：从一次parseInt导致的异常排查经历</title>
+    <meta name="description" content="生活不止眼前的代码，还有读不懂的诗和看不尽的远方~">
+    <meta name="author" content="Victor Lv">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+    <script src="http://langlv.me/theme/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="http://langlv.me/theme/bootstrap.min.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/local.css" rel="stylesheet">
+    <link href="http://langlv.me/theme/pygments.css" rel="stylesheet">
+
+    <!-- So Firefox can bookmark->"abo this site" -->
+        <link href="http://langlv.me/feeds/all.rss.xml" rel="alternate" title="Victor Lv's Blog" type="application/rss+xml">
+
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="navbar-inner">
+    <div class="container">
+
+         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+         </a>
+
+        <a class="brand" href="http://langlv.me">Victor Lv's Blog</a>
+
+        <div class="nav-collapse">
+        <ul class="nav">
+            <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+            <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+            <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+            
+            <li><a href="http://langlv.me/pages/aboutMe.html">关于</a></li>
+        </ul>
+
+        </div>
+
+    </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content">
+    <div class="row">
+
+        <div class="span9">
+    <div class='article'>
+        <div class="content-title">
+            <h1>引申：从一次parseInt导致的异常排查经历</h1>
+2019-07-20
+
+by <a class="url fn" href="http://langlv.me/author/victor-lv.html">Victor Lv</a>
+ 
+
+ Filed under <a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a> 
+
+
+        </div>
+	
+        <div><h2>引申：从一次parseInt导致的异常排查经历</h2>
+<p>系统所用框架描述：
+JSF +  EJB + JBOSS 中间件（银行老系统用的老技术……）   </p>
+<h4>一、现象描述：</h4>
+<p>页面报系统异常，观察日志只有一句相关报错：   </p>
+<div class="highlight"><pre><span></span><span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">20</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mi">44</span><span class="o">,</span><span class="mo">021</span> <span class="n">INFO</span>  <span class="o">[</span><span class="n">stdout</span><span class="o">]</span> <span class="o">(</span><span class="k">default</span> <span class="n">task</span><span class="o">-</span><span class="mi">14</span><span class="o">)</span> <span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">20</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mi">44</span><span class="o">,</span><span class="mo">021</span> <span class="o">[</span><span class="k">default</span> <span class="n">task</span><span class="o">-</span><span class="mi">14</span><span class="o">]</span> <span class="n">DEBUG</span> <span class="n">xxxxxxxxxxx</span><span class="o">.</span><span class="na">SessionValidateFilter</span> <span class="o">:</span> <span class="n">非第一次登录</span><span class="err">，</span><span class="n">检查用户信息是否继续有效</span>
+<span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">20</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mi">44</span><span class="o">,</span><span class="mo">026</span> <span class="n">INFO</span>  <span class="o">[</span><span class="n">stdout</span><span class="o">]</span> <span class="o">(</span><span class="k">default</span> <span class="n">task</span><span class="o">-</span><span class="mi">14</span><span class="o">)</span> <span class="mi">2019</span><span class="o">-</span><span class="mo">07</span><span class="o">-</span><span class="mi">20</span> <span class="mi">15</span><span class="o">:</span><span class="mi">54</span><span class="o">:</span><span class="mi">44</span><span class="o">,</span><span class="mo">025</span> <span class="o">[</span><span class="k">default</span> <span class="n">task</span><span class="o">-</span><span class="mi">14</span><span class="o">]</span> <span class="n">ERROR</span> <span class="n">xxxxxxxxxxx</span><span class="o">.</span><span class="na">exception</span><span class="o">.</span><span class="na">ExceptionMBean</span> <span class="o">-</span> <span class="n">javax</span><span class="o">.</span><span class="na">servlet</span><span class="o">.</span><span class="na">ServletException</span><span class="o">:</span> <span class="n">For</span> <span class="n">input</span> <span class="n">string</span><span class="o">:</span> <span class="s">&quot;&quot;</span>
+</pre></div>
+
+
+<p>但是同样的代码包在另一台服务器的应用上跑一切正常。  </p>
+<h4>二、分析</h4>
+<p>刚开始，根据日志的上下文，Debug 调试跟踪 SessionValidateFilter 进去，发现是 chain.dofilter() 里面抛出的异常，具体的异常是：<code>Integer.parseInt NumberFormatException,  For input string: ""</code>（也就是拿一个空字符串进行数字转换时导致的 NumberFormatException ）。一度以为是Session拦截校验器（自己系统编写的）出的啥问题，但是 chain.dofilter() 几乎无法调试，我们知道 filter 作为 JavaWeb 三大组件（另外两个是 listener 和 servlet ），它的作用是在执行 servlet 之前先执行一道拦截过滤，然后再把 httpRequest 往下转发给 servlet，所以 chain.dofilter() 干的事不仅是往下传递给下一个拦截器，还会把  httpRequest转发给 servlet，这种 JavaWeb 框架里面抛出的异常怎么调试？一度还在各个 filter 里面打断点观察，结果自然是一无所获。浏览器 F12 调试也只是看到个 httpCode-302 的信息，不足以辅助分析。  </p>
+<p>后来转换了下思维方式，我直接从抛出来的这个异常出发，进行排查。于是找到了 Integer.parseInt()，在这里打断点拦截观察，一堆字符串传进来进行转换，发现中间确实会有一个空字符串<code>""</code>被传进来，parseInt() 里面抛出了 NumberFormatException 这个异常。但这个空串是谁传进来的呢？是不是框架或者过滤器传进来的（因此还一度怀疑是 session 的问题，或者是浏览器兼容性问题）？根这个 parserInt 这么多地方（大部分都是引的 jar 里面引用的）都调用了，当然无法<code>call hierarchy</code> 来逐一排查。  </p>
+<p>在同事的启发下，我全局搜索了我们系统自己写的代码中使用 <code>Integer.parseInt()</code>的地方，于是发现了该异常的真正出处，这是某外包同事对一个从配置文件读取出来的字符串进行<code>Integer.parseInt()</code>转换。 What？从配置文件读取的内容啥判断也没有直接传进去各种转换？编码习惯坑爹啊。  </p>
+<h4>三、排查为何如此苦逼</h4>
+<p>幸亏这也是在开发环境发现，还能进行 debug 排查，如果是在生产环境，日志里面就那句报错，岂不是要命？至于为什么日志里面没有打印更详细的错误信息？这是因为我们系统使用的 JSF + EJB 的组合中，对于各种异常的捕获及日志打印，绝大多数都是在 EJB 层，以及 JSF + EJB 接口交互层，但是 JSF 里面的 ManageBean 层作为 Java 程序的最外层，如果这里面出了异常，会导致页面直接报<code>系统错误</code>或<code>未知错误</code>，同时因为缺少 <code>try-catch</code>块（因为程序员认为自己的代码就几行不肯定不会导致异常），日志也几乎不会打印这种 MBean 层出现的错误。  </p>
+<h4>四、痛定思痛</h4>
+<p>总结经验教训：</p>
+<h5>1、加强代码习惯培养:</h5>
+<p>尤其是要改掉导致 Bug 的坏习惯，在本人两年的工作经验，在我所在的团队里，最常见的就有三种坏习惯：  </p>
+<h6>（1）永远不要相信从外界（非程序定义常量）读取到的东西：</h6>
+<p>一种就是上述所提的，没有对外界输入的参数持有充分的怀疑心，拿到外界（比如配置文件，或者页面）输入参数后，没有任何判断，就往下进行各种转换，要是环境一切正常还好，但实际上，测试环境和生产环境各类因素极其复杂，很容易导致外界输入参数不符合预期，进而导致后续转换错误。  </p>
+<h6>（2）强制类型转换：</h6>
+<p>一个父类（假设是A）衍生有两个子类（假设是 A1、A2），A1 、A2各自的属性有所差异，方法（假设是handle()）传入的参数是父类 A，但方法中要对 A2 的特定属性（假设是 A2.username）做校验或其他处理，于是将 A 对象强制转换成了 A2，以便通过<code>(A2)A.getUserName</code>这样的代码取出 A2.username 属性进行处理。问题在于，如果 handle() 传进来的子类是 A2，程序并不会有什么问题，因为这样的 A 可以强制转换成 A2，但是万一传进来的是一个 A1 对象，那强制转换就会出现异常。  </p>
+<h6>（3）日志捕获后不做任何处理：</h6>
+<p>这在身边同事中就出现过很多这样的代码，因为我们习惯了使用 IDE 软件的自动补全，编写<code>try - catch</code>代码块时，会使用 IDE 的自动生成 try-catch 代码块，但自动生成的 catch 函数体中，一般是没有任何代码，或者只有简单的 e.printStack ，比较好的 IDE 比如 idea intelli会有<code>//TODO</code>提醒，但开发人员往往着重于 <code>try{}</code>里面的业务实现，而忽略了 <code>catch{}</code>代码块里面的完善，甚至连日志也不打。这就会导致两个及其严重的问题，万一 <code>try{}</code>代码块中抛出了异常，虽然<code>catch</code>到了但任何错误日志也没有打印，导致排查问题困难；更重要的问题是，如果<code>catch{}</code>里面既不往外层<code>throw Exception</code>，也不<code>return;</code>，那么代码还会继续往下执行！也就是说虽然 <code>try{}</code>代码块中业务逻辑已经出错抛出了异常，但程序还是会认为是正常的而继续往下执行，这就导致了业务执行错误的严重问题。  </p>
+<h6>（4）题外话：</h6>
+<p>关于“<code>catch{}</code>方法体里面如果不做任何事代码还会不会继续往下执行”这个 Java 语法基本功，我竟然用这个问题考倒了一大批工作2~5年工作经验的外包，只有一位开发能力和经验都比较强的人答对了，其他一概面试者或外包同事，都回答错误，所以后来我在面试外包公司的员工时，会以这道题目作为考察面试者 Java 基本功以及项目问题解决实战的必备考题。</p></div>
+	
+        <br>
+
+
+    <p style="font-style:italic">本文作者为 Victor Lv ,原出处为<a href="http://langlv.me">Victor Lv's Blog（http://langlv.me）</a>，转载请保留此句。</p>
+    
+    <hr>
+	
+ 
+		标签 <a href="http://langlv.me/tag/bian-cheng.html">编程</a> 	
+    </div>
+        </div>
+        
+
+        <div class="span3">
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                文章
+                </li>
+            
+                <li><a href="http://langlv.me/archives.html">归档</a>
+                <li><a href="http://langlv.me/tags.html">标签</a>
+
+
+
+                <li><a href="http://langlv.me/feeds/all.rss.xml" rel="alternate">RSS订阅</a></li>
+
+            </ul>
+            </div>
+
+
+            <div class="well" style="padding: 8px 0; background-color: #FBFBFB;">
+            <ul class="nav nav-list">
+                <li class="nav-header"> 
+                分类
+                </li>
+                
+                <li><a href="http://langlv.me/category/du-shu-guan-ying.html">读书观影</a></li>
+                <li><a href="http://langlv.me/category/ji-zhu-bo-ke.html">技术博客</a></li>
+                <li><a href="http://langlv.me/category/wo-si-wo-xiang.html">我思我想</a></li>
+                   
+            </ul>
+            </div>
+
+
+
+
+        </div>  
+    </div>     </div> 
+<footer>
+<br />
+<p><a href="http://langlv.me">Victor Lv's Blog</a> &copy; Victor Lv 2019<a href="http://www.miitbeian.gov.cn/"> 粤ICP备17052180号</a></p>
+</footer>
+
+</div> <!-- /container -->
+<!-- 貌似国内访问这句JS地址（被墙）加载会导致刷出网页转很久的圈？
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+-->
+<script src="http://langlv.me/theme/bootstrap-collapse.js"></script>
+<!-- 右上角显示  "Fork me on github" 
+-->
+
+<a href="https://github.com/Victor-Lv/"><img style="position: absolute; top: 40px; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" /></a>
+ 
+</body>
+</html>
